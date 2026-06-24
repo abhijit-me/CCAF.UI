@@ -1,0 +1,306 @@
+import { useState, useEffect, useCallback } from 'react';
+import { slides } from './slides';
+import { d1Flashcards, d2Flashcards, d3Flashcards, d4Flashcards, d5Flashcards } from './flashcardsData';
+
+const flashcardSets = { d1Flashcards, d2Flashcards, d3Flashcards, d4Flashcards, d5Flashcards };
+
+// ===== TITLE SLIDE =====
+function TitleSlide() {
+  return (
+    <div className="title-slide">
+      <div className="title-logo animate-in">CC</div>
+      <h1 className="title-main animate-in-delay-1">Claude Certification<br/>Preparations</h1>
+      <p className="title-sub animate-in-delay-2">CCA-F — Claude Certified Architect: Foundations</p>
+      <div className="title-credits animate-in-delay-4">
+        Created by Abhijit Das 
+        <br/>
+        with contributions from Prayas Mohanty
+      </div>
+    </div>
+  );
+}
+
+// ===== EXAM INFO SLIDE =====
+function ExamInfoSlide() {
+  return (
+    <>
+      <div className="slide-header animate-in">
+        <h2>Exam Information</h2>
+        <p className="subtitle">Key facts about the CCA-F certification exam</p>
+      </div>
+      <div className="slide-content">
+        <div className="exam-grid">
+          {[
+            { num: "60", label: "Multiple-choice questions" },
+            { num: "120", label: "Minutes · online proctored" },
+            { num: "720", label: "Scaled score to pass (of 1000)" },
+            { num: "$99", label: "Fee (waived for partners)" },
+          ].map((s, i) => (
+            <div key={i} className={`exam-stat animate-in-delay-${i+1}`}>
+              <div className="number">{s.num}</div>
+              <div className="label">{s.label}</div>
+            </div>
+          ))}
+        </div>
+        <div className="callout callout-key animate-in-delay-3" style={{marginTop: 16}}>
+          <strong>Exam mechanics:</strong> One correct answer + three distractors each · no penalty for guessing — never leave a blank. Questions hand you a production symptom and ask for the <em>most effective</em> fix.
+        </div>
+        <div className="callout callout-tip animate-in-delay-4">
+          <strong>Green-light rule:</strong> Score 900+ on the Practice Exam first — that's your go/no-go signal. 1 attempt, then a 6-month cooldown.
+        </div>
+        <table className="slide-table animate-in-delay-4">
+          <thead><tr><th>Domain</th><th>Weight</th><th>≈ Questions</th></tr></thead>
+          <tbody>
+            <tr><td>D1 · Agentic Architecture</td><td>27%</td><td>~16</td></tr>
+            <tr><td>D3 · Claude Code Config</td><td>20%</td><td>~12</td></tr>
+            <tr><td>D4 · Prompt Engineering</td><td>20%</td><td>~12</td></tr>
+            <tr><td>D2 · Tool Design & MCP</td><td>18%</td><td>~11</td></tr>
+            <tr><td>D5 · Context Management</td><td>15%</td><td>~9</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+// ===== TOC SLIDE =====
+function TOCSlide({ goToSlide }) {
+  const domains = [
+    { id: 1, title: "Agentic Architecture & Orchestration", weight: "27%", color: "var(--d1)" },
+    { id: 2, title: "Tool Design & MCP Integration", weight: "18%", color: "var(--d2)" },
+    { id: 3, title: "Claude Code Configuration & Workflows", weight: "20%", color: "var(--d3)" },
+    { id: 4, title: "Prompt Engineering & Structured Output", weight: "20%", color: "var(--d4)" },
+    { id: 5, title: "Context Management & Reliability", weight: "15%", color: "var(--d5)" },
+  ];
+
+  const domainSlideIndices = [3, 13, 21, 31, 40];
+
+  return (
+    <>
+      <div className="slide-header animate-in">
+        <h2>Contents</h2>
+        <p className="subtitle">Five domains covering 28 task statements</p>
+      </div>
+      <div className="slide-content" style={{justifyContent: 'center'}}>
+        <ul className="toc-list">
+          {domains.map((d, i) => (
+            <li
+              key={d.id}
+              className={`toc-item animate-in-delay-${i+1}`}
+              onClick={() => goToSlide(domainSlideIndices[i])}
+            >
+              <div className="toc-badge" style={{background: d.color}}>{d.id}</div>
+              <div className="toc-text">
+                <h3>{d.title}</h3>
+                <span>{d.weight} of scored content</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </>
+  );
+}
+
+// ===== DOMAIN TITLE SLIDE =====
+function DomainTitleSlide({ data }) {
+  return (
+    <div className="domain-title-slide">
+      <div className="domain-big-badge animate-scale" style={{background: data.color}}>{data.domain}</div>
+      <h2 className="animate-in-delay-1">{data.title}</h2>
+      <p className="weight animate-in-delay-2">{data.weight}</p>
+      <p className="desc animate-in-delay-3">{data.desc}</p>
+    </div>
+  );
+}
+
+// ===== CONTENT SLIDE =====
+function ContentSlide({ data }) {
+  return (
+    <>
+      <div className="slide-header animate-in">
+        {data.task && <div className="task-badge" style={{background: data.color}}>{data.task}</div>}
+        <h2>{data.title}</h2>
+      </div>
+      <div className="slide-content">
+        {data.table && (
+          <table className="slide-table animate-in-delay-1">
+            <thead><tr>{data.table.headers.map((h,i) => <th key={i}>{h}</th>)}</tr></thead>
+            <tbody>{data.table.rows.map((row,i) => (
+              <tr key={i}>{row.map((cell,j) => <td key={j}>{cell}</td>)}</tr>
+            ))}</tbody>
+          </table>
+        )}
+        {data.bullets && (
+          <ul className="bullet-list animate-in-delay-1">
+            {data.bullets.map((b, i) => (
+              <li key={i} dangerouslySetInnerHTML={{__html: b}} />
+            ))}
+          </ul>
+        )}
+        {data.principles && (
+          <div className="principles-list animate-in-delay-1">
+            {data.principles.map((p, i) => (
+              <div key={i} className="callout callout-key principle-box">
+                <span dangerouslySetInnerHTML={{__html: p}} />
+              </div>
+            ))}
+          </div>
+        )}
+        {data.code && (
+          <div className="code-block animate-in-delay-2">{data.code}</div>
+        )}
+        {data.callout && (
+          <div className={`callout callout-${data.callout.type} animate-in-delay-3`}>
+            <span dangerouslySetInnerHTML={{__html: data.callout.text}} />
+          </div>
+        )}
+        {data.example && (
+          <div className="example-box animate-in-delay-4">
+            <h4>{data.example.title}</h4>
+            <p>{data.example.text}</p>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+// ===== FLASHCARD SLIDE =====
+function FlashcardSlide({ data }) {
+  const cards = flashcardSets[data.dataKey];
+  const [idx, setIdx] = useState(0);
+  const [flipped, setFlipped] = useState(false);
+
+  const next = () => { setFlipped(false); setTimeout(() => setIdx((idx + 1) % cards.length), 150); };
+  const prev = () => { setFlipped(false); setTimeout(() => setIdx((idx - 1 + cards.length) % cards.length), 150); };
+
+  return (
+    <div className="flashcard-slide">
+      <div className="slide-header flashcard-header animate-in">
+        <h2>{data.title}</h2>
+        <p className="subtitle">Click the card to flip · Use card buttons to navigate</p>
+      </div>
+      <div className="flashcard-wrapper" onClick={() => setFlipped(!flipped)}>
+        <div className={`flashcard-inner ${flipped ? 'flipped' : ''}`}>
+          <div className="flashcard-face flashcard-front">
+            <div className="fc-label">Question {idx + 1} of {cards.length}</div>
+            <div>{cards[idx].q}</div>
+            <div className="fc-hint">Click to flip</div>
+          </div>
+          <div className="flashcard-face flashcard-back">
+            <div className="fc-label">Answer</div>
+            <div>{cards[idx].a}</div>
+          </div>
+        </div>
+      </div>
+      <div className="fc-controls">
+        <button className="fc-btn" onClick={(e) => { e.stopPropagation(); prev(); }}>‹ Prev</button>
+        <span className="fc-counter">{idx + 1} / {cards.length}</span>
+        <button className="fc-btn" onClick={(e) => { e.stopPropagation(); next(); }}>Next ›</button>
+      </div>
+    </div>
+  );
+}
+
+// ===== THANK YOU SLIDE =====
+function ThankYouSlide() {
+  return (
+    <div className="thankyou-slide">
+      <div className="title-logo animate-in" style={{marginBottom: 30}}>CC</div>
+      <h2 className="animate-in-delay-1">Thank You!</h2>
+      <p className="animate-in-delay-2" style={{color: 'var(--muted)', fontSize: '1.1rem'}}>
+        Good luck with your CCA-F certification!
+      </p>
+      <div className="thankyou-credits animate-in-delay-3">
+        Created by Abhijit Das with contributions from Prayas Mohanty
+      </div>
+    </div>
+  );
+}
+
+// ===== PARTICLES BACKGROUND =====
+function Particles() {
+  const particles = Array.from({length: 20}, (_, i) => ({
+    id: i,
+    left: Math.random() * 100,
+    top: Math.random() * 100,
+    delay: Math.random() * 8,
+    size: 2 + Math.random() * 4,
+  }));
+  return (
+    <div className="particles">
+      {particles.map(p => (
+        <div key={p.id} className="particle" style={{
+          left: `${p.left}%`, top: `${p.top}%`,
+          width: p.size, height: p.size,
+          animationDelay: `${p.delay}s`,
+        }} />
+      ))}
+    </div>
+  );
+}
+
+// ===== MAIN APP =====
+export default function App() {
+  const [current, setCurrent] = useState(0);
+  const [direction, setDirection] = useState('right');
+
+  const goTo = useCallback((idx) => {
+    if (idx === current || idx < 0 || idx >= slides.length) return;
+    setDirection(idx > current ? 'right' : 'left');
+    setCurrent(idx);
+  }, [current]);
+
+  const next = useCallback(() => goTo(current + 1), [goTo, current]);
+  const prev = useCallback(() => goTo(current - 1), [goTo, current]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [next, prev]);
+
+  const progress = ((current + 1) / slides.length) * 100;
+
+  const renderSlide = (slide, index) => {
+    const isActive = index === current;
+    const isPrev = index < current;
+    let className = 'slide';
+    if (isActive) className += ' active';
+    else if (isPrev) className += ' exit-left';
+
+    if (!isActive && Math.abs(index - current) > 1) return null;
+
+    let content;
+    switch (slide.type) {
+      case 'title': content = <TitleSlide />; break;
+      case 'exam-info': content = <ExamInfoSlide />; break;
+      case 'toc': content = <TOCSlide goToSlide={goTo} />; break;
+      case 'domain-title': content = <DomainTitleSlide data={slide} />; break;
+      case 'content': content = <ContentSlide data={slide} />; break;
+      case 'flashcard': content = <FlashcardSlide data={slide} />; break;
+      case 'thankyou': content = <ThankYouSlide />; break;
+      default: content = null;
+    }
+
+    return (
+      <div key={index} className={className}>
+        {content}
+      </div>
+    );
+  };
+
+  return (
+    <div className="presentation">
+      <Particles />
+      <div className="progress-bar" style={{width: `${progress}%`}} />
+      {slides.map((slide, i) => renderSlide(slide, i))}
+      <div className="slide-counter">{current + 1} / {slides.length}</div>
+      <div className="nav-hint">← → Arrow keys to navigate</div>
+    </div>
+  );
+}
