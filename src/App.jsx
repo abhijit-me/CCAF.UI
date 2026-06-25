@@ -73,7 +73,7 @@ function TOCSlide({ goToSlide }) {
     { id: 5, title: "Context Management & Reliability", weight: "15%", color: "var(--d5)" },
   ];
 
-  const domainSlideIndices = [3, 13, 21, 31, 40];
+  const domainSlideIndices = [3, 13, 21, 29, 37];
 
   return (
     <>
@@ -169,35 +169,32 @@ function ContentSlide({ data }) {
 // ===== FLASHCARD SLIDE =====
 function FlashcardSlide({ data }) {
   const cards = flashcardSets[data.dataKey];
-  const [idx, setIdx] = useState(0);
-  const [flipped, setFlipped] = useState(false);
+  const [flippedIdx, setFlippedIdx] = useState(null);
 
-  const next = () => { setFlipped(false); setTimeout(() => setIdx((idx + 1) % cards.length), 150); };
-  const prev = () => { setFlipped(false); setTimeout(() => setIdx((idx - 1 + cards.length) % cards.length), 150); };
+  const toggle = (i) => setFlippedIdx(prev => prev === i ? null : i);
 
   return (
-    <div className="flashcard-slide">
+    <div className="fc-slide">
       <div className="slide-header flashcard-header animate-in">
         <h2>{data.title}</h2>
-        <p className="subtitle">Click the card to flip · Use card buttons to navigate</p>
+        <p className="subtitle">Click any card to flip · All {cards.length} cards at a glance</p>
       </div>
-      <div className="flashcard-wrapper" onClick={() => setFlipped(!flipped)}>
-        <div className={`flashcard-inner ${flipped ? 'flipped' : ''}`}>
-          <div className="flashcard-face flashcard-front">
-            <div className="fc-label">Question {idx + 1} of {cards.length}</div>
-            <div>{cards[idx].q}</div>
-            <div className="fc-hint">Click to flip</div>
+      <div className="fc-grid">
+        {cards.map((card, i) => (
+          <div key={i} className="fc-cell" onClick={() => toggle(i)}>
+            <div className={`fc-cell-inner ${flippedIdx === i ? 'flipped' : ''}`}>
+              <div className="fc-cell-face fc-cell-front">
+                <span className="fc-cell-num">Q{i + 1}</span>
+                <p className="fc-cell-text">{card.q}</p>
+                <span className="fc-cell-hint">tap to flip</span>
+              </div>
+              <div className="fc-cell-face fc-cell-back">
+                <span className="fc-cell-num">A{i + 1}</span>
+                <p className="fc-cell-text">{card.a}</p>
+              </div>
+            </div>
           </div>
-          <div className="flashcard-face flashcard-back">
-            <div className="fc-label">Answer</div>
-            <div>{cards[idx].a}</div>
-          </div>
-        </div>
-      </div>
-      <div className="fc-controls">
-        <button className="fc-btn" onClick={(e) => { e.stopPropagation(); prev(); }}>‹ Prev</button>
-        <span className="fc-counter">{idx + 1} / {cards.length}</span>
-        <button className="fc-btn" onClick={(e) => { e.stopPropagation(); next(); }}>Next ›</button>
+        ))}
       </div>
     </div>
   );
@@ -301,6 +298,8 @@ export default function App() {
       {slides.map((slide, i) => renderSlide(slide, i))}
       <div className="slide-counter">{current + 1} / {slides.length}</div>
       <div className="nav-hint">← → Arrow keys to navigate</div>
+      <div className="tap-zone tap-zone-left" onClick={prev} />
+      <div className="tap-zone tap-zone-right" onClick={next} />
     </div>
   );
 }

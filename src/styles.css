@@ -102,6 +102,19 @@ html, body, #root {
   opacity: 0.6;
 }
 
+/* ============ TAP ZONES (tablet touch navigation) ============ */
+.tap-zone {
+  position: fixed;
+  top: 0;
+  height: 100%;
+  width: 5%;
+  z-index: 100;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.tap-zone-left  { left: 0; }
+.tap-zone-right { right: 0; }
+
 /* ============ ANIMATIONS ============ */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(40px); }
@@ -612,149 +625,170 @@ html, body, #root {
   transform: translateX(4px);
 }
 
-/* ============ FLASHCARDS ============ */
+/* ============ FLASHCARD GRID ============ */
 .flashcard-header {
+  width: 100% !important;
+  min-width: 100% !important;
   text-align: center;
-  margin-bottom: 24px;
-  width: 100%;
-  min-width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex-shrink: 0;
+  margin-bottom: 12px;
 }
 
 .flashcard-header h2 {
-  background: none;
-  -webkit-background-clip: unset;
-  background-clip: unset;
-  -webkit-text-fill-color: var(--accent);
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  -webkit-text-fill-color: var(--accent) !important;
   color: var(--accent);
 }
 
-.flashcard-slide {
-  text-align: center;
-  width: 80%;
-  min-width: 80%;
-}
-
-.flashcard-wrapper {
-  perspective: 1000px;
+.fc-slide {
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  min-height: 260px;
-  margin: 0 auto 28px;
-  cursor: pointer;
+  flex: 1;
+  min-height: 0;
 }
 
-.flashcard-inner {
+/* 4×2 default — screens wider than 1280 px */
+.fc-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 180px);
+  gap: 10px;
+  flex: none;
+  margin: auto 0;
+}
+
+/* 2×4 — between 601 px and 1280 px */
+@media (max-width: 1280px) {
+  .fc-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, 180px);
+  }
+}
+
+/* 1×8 — mobile */
+@media (max-width: 600px) {
+  .fc-slide {
+    overflow-y: auto;
+  }
+  .fc-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    flex: none;
+    height: auto;
+    margin: 0;
+  }
+  .fc-cell {
+    height: 180px;
+  }
+}
+
+.fc-cell {
+  perspective: 700px;
+  cursor: pointer;
+  min-height: 0;
+}
+
+.fc-cell-inner {
   position: relative;
   width: 100%;
-  min-height: 260px;
-  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  height: 100%;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
   transform-style: preserve-3d;
 }
 
-.flashcard-inner.flipped {
+.fc-cell-inner.flipped {
   transform: rotateX(180deg);
 }
 
-.flashcard-face {
+.fc-cell-face {
   position: absolute;
   inset: 0;
   backface-visibility: hidden;
-  border-radius: 16px;
-  padding: 40px 36px;
+  border-radius: 10px;
+  padding: 10px 14px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   text-align: center;
+  gap: 6px;
+  overflow: hidden;
 }
 
-.flashcard-front {
+.fc-cell-front {
   background: var(--surface);
   border: 2px solid var(--border);
-  font-size: 1.4rem;
-  line-height: 1.6;
-  font-weight: 500;
-  box-shadow: 0 8px 32px rgba(37,99,235,0.1);
+  box-shadow: 0 3px 12px rgba(37,99,235,0.07);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.flashcard-front .fc-label {
-  font-size: 0.75rem;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  margin-bottom: 20px;
-  padding: 4px 12px;
-  border: 1px solid rgba(37,99,235,0.2);
-  border-radius: 6px;
-  background: rgba(37,99,235,0.04);
+.fc-cell:hover .fc-cell-front {
+  border-color: var(--accent);
+  box-shadow: 0 4px 18px rgba(37,99,235,0.14);
 }
 
-.flashcard-front .fc-hint {
-  font-size: 0.8rem;
-  color: var(--dim);
-  margin-top: 24px;
-  animation: float 2s ease-in-out infinite;
-}
-
-.flashcard-back {
+.fc-cell-back {
   transform: rotateX(180deg);
   background: linear-gradient(135deg, #f0fdf4 0%, #ecfeff 100%);
-  border: 2px solid rgba(5,150,105,0.25);
-  font-size: 1.25rem;
-  line-height: 1.7;
-  color: var(--text);
-  box-shadow: 0 8px 32px rgba(5,150,105,0.1);
+  border: 2px solid rgba(5,150,105,0.3);
+  box-shadow: 0 3px 12px rgba(5,150,105,0.08);
 }
 
-.flashcard-back .fc-label {
-  font-size: 0.75rem;
-  color: var(--emerald);
+.fc-cell-num {
+  font-size: 0.6rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  margin-bottom: 20px;
-  padding: 4px 12px;
-  border: 1px solid rgba(5,150,105,0.25);
-  border-radius: 6px;
-  background: rgba(5,150,105,0.04);
+  letter-spacing: 0.1em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  flex-shrink: 0;
 }
 
-.fc-controls {
+.fc-cell-front .fc-cell-num {
+  color: var(--accent);
+  border: 1px solid rgba(37,99,235,0.2);
+  background: rgba(37,99,235,0.05);
+}
+
+.fc-cell-back .fc-cell-num {
+  color: var(--emerald);
+  border: 1px solid rgba(5,150,105,0.25);
+  background: rgba(5,150,105,0.05);
+}
+
+.fc-cell-text {
+  font-size: 1.05rem;
+  line-height: 1.45;
+  flex: 1;
   display: flex;
-  gap: 16px;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  margin: 0;
 }
 
-.fc-btn {
-  background: var(--surface);
-  border: 1px solid var(--border);
+.fc-cell-front .fc-cell-text {
+  font-weight: 500;
   color: var(--text);
-  padding: 10px 26px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-family: var(--mono);
-  transition: all 0.25s;
+}
+
+.fc-cell-back .fc-cell-text {
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.fc-cell-hint {
+  font-size: 0.65rem;
+  color: var(--dim);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: 0.8rem;
-}
-
-.fc-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: rgba(37,99,235,0.04);
-  box-shadow: 0 4px 12px rgba(37,99,235,0.12);
-}
-
-.fc-counter {
-  color: var(--muted);
-  font-family: var(--mono);
-  font-size: 0.8rem;
-  min-width: 60px;
-  text-align: center;
+  flex-shrink: 0;
+  animation: float 2s ease-in-out infinite;
 }
 
 /* ============ THANK YOU SLIDE ============ */
@@ -788,9 +822,7 @@ html, body, #root {
 /* ============ RESPONSIVE ============ */
 @media (max-width: 960px) {
   .slide-header,
-  .slide-content,
-  .flashcard-slide,
-  .flashcard-wrapper {
+  .slide-content {
     width: 100%;
     min-width: 100%;
   }

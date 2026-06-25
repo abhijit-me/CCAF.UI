@@ -398,7 +398,7 @@ paths: ["src/api/**", "src/middleware/**"]
     type: "content",
     domain: 3,
     color: "var(--d3)",
-    task: "3.4–3.5",
+    task: "3.4",
     title: "Plan Mode, Direct Execution & Iterative Refinement",
     bullets: [
       "<strong>Plan mode</strong> — complex: multi-file, multiple approaches, architectural decisions",
@@ -414,7 +414,7 @@ paths: ["src/api/**", "src/middleware/**"]
     type: "content",
     domain: 3,
     color: "var(--d3)",
-    task: "3.6",
+    task: "3.5",
     title: "Claude Code in CI/CD",
     bullets: [
       "<strong>-p / --print</strong> runs non-interactive — processes prompt, prints to stdout, exits",
@@ -642,7 +642,7 @@ messages.append({"role":"user", "content": "There were errors. Please try again.
     type: "content",
     domain: 5,
     color: "var(--d5)",
-    task: "5.5–5.6",
+    task: "5.5",
     title: "Human Review, Confidence & Provenance",
     bullets: [
       "<strong>Aggregate accuracy masks</strong> poor performance on specific types (97% overall hides 70% segment)",
