@@ -20,6 +20,30 @@ function TitleSlide() {
   );
 }
 
+// ===== DISCLAIMER SLIDE =====
+function DisclaimerSlide() {
+  return (
+    <div className="disclaimer-slide">
+      <div className="disclaimer-icon animate-in">⚠️</div>
+      <h2 className="animate-in-delay-1">Disclaimer</h2>
+      <div className="disclaimer-body animate-in-delay-2">
+        <p>
+          The content in these slides is <strong>not a complete study guide</strong> for the CCA-F certification exam.
+        </p>
+        <p>
+          These pages contain <strong>important points, key tips, and common pitfalls</strong> carefully distilled from the exam domains — designed to act as a <strong>quick refresher</strong> before you sit the certification exam.
+        </p>
+        <p>
+          For thorough preparation, please refer to the official Anthropic documentation, the full exam guide, and other comprehensive study materials.
+        </p>
+      </div>
+      <div className="disclaimer-badge animate-in-delay-3">
+        Best used as a final review · not as a primary study resource
+      </div>
+    </div>
+  );
+}
+
 // ===== EXAM INFO SLIDE =====
 function ExamInfoSlide() {
   return (
@@ -73,7 +97,7 @@ function TOCSlide({ goToSlide }) {
     { id: 5, title: "Context Management & Reliability", weight: "15%", color: "var(--d5)" },
   ];
 
-  const domainSlideIndices = [3, 13, 21, 29, 37];
+  const domainSlideIndices = [4, 15, 24, 33, 42];
 
   return (
     <>
@@ -200,12 +224,114 @@ function FlashcardSlide({ data }) {
   );
 }
 
+// ===== ANTI-PATTERNS SLIDE =====
+function AntiPatternsSlide({ data }) {
+  return (
+    <>
+      <div className="slide-header animate-in">
+        <div className="task-badge" style={{ background: data.color }}>Anti-Patterns</div>
+        <h2>{data.title}</h2>
+        <p className="subtitle">{data.patterns.length} patterns — learn to spot and eliminate these as exam distractors</p>
+      </div>
+      <div className="slide-content">
+        <div className="ap-list">
+          {data.patterns.map((p, i) => (
+            <div key={i} className={`ap-item animate-in-delay-${Math.min(i + 1, 5)}`}>
+              <div className="ap-wrong-row">
+                <span className="ap-icon ap-icon-wrong">✕</span>
+                <div className="ap-text-block">
+                  <div className="ap-header-row">
+                    <span className="ap-wrong-title">{p.wrong}</span>
+                    <span className={`ap-badge ap-badge-${p.severity.toLowerCase()}`}>{p.severity}</span>
+                  </div>
+                  <p className="ap-desc">{p.wrongDesc}</p>
+                </div>
+              </div>
+              <div className="ap-right-row">
+                <span className="ap-icon ap-icon-right">✓</span>
+                <div className="ap-text-block">
+                  <span className="ap-right-title">{p.right}</span>
+                  <p className="ap-desc">{p.rightDesc}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ===== SCENARIO SECTION TITLE SLIDE =====
+function ScenarioSectionSlide({ data }) {
+  return (
+    <div className="domain-title-slide">
+      <div className="domain-big-badge animate-scale" style={{background: data.color}}>S</div>
+      <h2 className="animate-in-delay-1">{data.title}</h2>
+      <p className="weight animate-in-delay-2">{data.subtitle}</p>
+      <p className="desc animate-in-delay-3">{data.desc}</p>
+    </div>
+  );
+}
+
+// ===== SCENARIO SLIDE =====
+function ScenarioSlide({ data }) {
+  return (
+    <>
+      <div className="slide-header animate-in">
+        <div className="task-badge" style={{background: data.color}}>Scenario {data.num}</div>
+        <h2>{data.title}</h2>
+        <p className="subtitle">{data.desc}</p>
+      </div>
+      <div className="slide-content">
+        <div className="sc-tags animate-in-delay-1">
+          {data.tags.map((tag, i) => (
+            <span key={i} className="sc-tag">{tag}</span>
+          ))}
+        </div>
+        <div className="sc-decisions animate-in-delay-2">
+          {data.decisions.map((d, i) => (
+            <div key={i} className={`ap-item animate-in-delay-${Math.min(i + 1, 5)}`}>
+              <div className="sc-question-row">{d.question}</div>
+              <div className="ap-right-row">
+                <span className="ap-icon ap-icon-right">✓</span>
+                <div className="ap-text-block">
+                  <span className="ap-right-title">Correct</span>
+                  <p className="ap-desc">{d.correct}</p>
+                </div>
+              </div>
+              <div className="ap-wrong-row">
+                <span className="ap-icon ap-icon-wrong">✕</span>
+                <div className="ap-text-block">
+                  <div className="ap-header-row">
+                    <span className="ap-wrong-title">Anti-Pattern</span>
+                  </div>
+                  <p className="ap-desc">{d.antiPattern}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="callout callout-key sc-callout animate-in-delay-3">
+          <strong>Domains — </strong>{data.domains.join(' · ')}
+        </div>
+        <div className="callout callout-tip sc-callout animate-in-delay-4">
+          <strong>Exam Strategy — </strong>{data.strategy}
+        </div>
+      </div>
+    </>
+  );
+}
+
 // ===== THANK YOU SLIDE =====
 function ThankYouSlide() {
   return (
     <div className="thankyou-slide">
       <div className="title-logo animate-in" style={{marginBottom: 30}}>CC</div>
       <h2 className="animate-in-delay-1">Thank You!</h2>
+      <p className="animate-in-delay-2" style={{color: 'var(--muted)', fontSize: '1rem', marginTop: 12}}>
+        Register for the certification at <a href="https://anthropic.skilljar.com/claude-certified-architect-foundations-certification"><span style={{color: 'var(--accent)', fontWeight: 600}}>this link</span></a>
+      </p>
       <p className="animate-in-delay-2" style={{color: 'var(--muted)', fontSize: '1.1rem'}}>
         Good luck with your CCA-F certification!
       </p>
@@ -275,11 +401,15 @@ export default function App() {
     let content;
     switch (slide.type) {
       case 'title': content = <TitleSlide />; break;
+      case 'disclaimer': content = <DisclaimerSlide />; break;
       case 'exam-info': content = <ExamInfoSlide />; break;
       case 'toc': content = <TOCSlide goToSlide={goTo} />; break;
       case 'domain-title': content = <DomainTitleSlide data={slide} />; break;
       case 'content': content = <ContentSlide data={slide} />; break;
       case 'flashcard': content = <FlashcardSlide data={slide} />; break;
+      case 'anti-patterns': content = <AntiPatternsSlide data={slide} />; break;
+      case 'scenario-section': content = <ScenarioSectionSlide data={slide} />; break;
+      case 'scenario': content = <ScenarioSlide data={slide} />; break;
       case 'thankyou': content = <ThankYouSlide />; break;
       default: content = null;
     }

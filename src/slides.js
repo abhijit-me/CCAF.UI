@@ -2,7 +2,10 @@ export const slides = [
   // ===== SLIDE 0: TITLE =====
   { type: "title" },
 
-  // ===== SLIDE 1: EXAM INFO =====
+  // ===== SLIDE 1: DISCLAIMER =====
+  { type: "disclaimer" },
+
+  // ===== SLIDE 2: EXAM INFO =====
   { type: "exam-info" },
 
   // ===== SLIDE 2: TABLE OF CONTENTS =====
@@ -184,6 +187,51 @@ export const slides = [
     ]
   },
 
+  // ===== DOMAIN 1 ANTI-PATTERNS =====
+  {
+    type: "anti-patterns",
+    domain: 1,
+    color: "var(--d1)",
+    title: "Domain 1 Anti-Patterns",
+    patterns: [
+      {
+        wrong: "Parsing natural language for loop termination",
+        wrongDesc: "Text content is for the user, not control flow. The model may phrase completion differently each time.",
+        severity: "CRITICAL",
+        right: "Check stop_reason field (tool_use vs end_turn)",
+        rightDesc: "stop_reason is a structured, deterministic field that reliably signals whether the agent needs to continue."
+      },
+      {
+        wrong: "Arbitrary iteration caps as primary stopping mechanism",
+        wrongDesc: "May cut off the agent mid-task or allow it to loop pointlessly. Does not reflect task completion.",
+        severity: "CRITICAL",
+        right: "Let the agentic loop terminate naturally via stop_reason",
+        rightDesc: "The model decides when it is done based on task state, not an arbitrary number."
+      },
+      {
+        wrong: "Prompt-based enforcement for critical business rules",
+        wrongDesc: "Prompts are probabilistic. The model CAN and WILL sometimes ignore critical instructions.",
+        severity: "CRITICAL",
+        right: "Use programmatic hooks (PreToolUse/PostToolUse) for deterministic enforcement",
+        rightDesc: "Hooks run as code, not suggestions. They provide 100% reliable enforcement."
+      },
+      {
+        wrong: "Sentiment-based escalation to human agents",
+        wrongDesc: "An angry customer with a simple request does NOT need a human. Sentiment does not equal task complexity.",
+        severity: "HIGH",
+        right: "Escalate based on policy gaps, capability limits, explicit requests, or business thresholds",
+        rightDesc: "Objective criteria prevent unnecessary escalations while catching genuine edge cases."
+      },
+      {
+        wrong: "Self-reported confidence scores for decision-making",
+        wrongDesc: "Model confidence scores are not well-calibrated and cannot be relied upon for production decisions.",
+        severity: "HIGH",
+        right: "Use structured criteria and programmatic checks for escalation decisions",
+        rightDesc: "Programmatic checks based on observable facts are reliable and auditable."
+      }
+    ]
+  },
+
   // ===== DOMAIN 1 FLASHCARDS =====
   { type: "flashcard", domain: 1, color: "var(--d1)", title: "Domain 1 Flashcards", dataKey: "d1Flashcards" },
 
@@ -317,6 +365,44 @@ export const slides = [
     ]
   },
 
+  // ===== DOMAIN 2 ANTI-PATTERNS =====
+  {
+    type: "anti-patterns",
+    domain: 2,
+    color: "var(--d2)",
+    title: "Domain 2 Anti-Patterns",
+    patterns: [
+      {
+        wrong: "Generic error messages ('Operation failed')",
+        wrongDesc: "The agent cannot decide whether to retry, try an alternative, or escalate without details.",
+        severity: "CRITICAL",
+        right: "Return structured errors: isError, errorCategory, isRetryable, and context",
+        rightDesc: "Structured errors give the agent enough information to make intelligent recovery decisions."
+      },
+      {
+        wrong: "Silently returning empty results for access failures",
+        wrongDesc: "The agent thinks 'no results found' when the real problem is 'could not even check.' This leads to catastrophic misunderstandings.",
+        severity: "CRITICAL",
+        right: "Distinguish access failures (isError: true) from genuinely empty results (isError: false, results: [])",
+        rightDesc: "The agent knows whether data is missing because it was not found vs. because the search failed."
+      },
+      {
+        wrong: "Giving one agent 18+ tools",
+        wrongDesc: "Tool selection accuracy degrades rapidly above 5 tools. Similar tools create ambiguity.",
+        severity: "HIGH",
+        right: "Keep 4–5 tools per agent. Distribute the rest across specialized subagents.",
+        rightDesc: "Focused agents with fewer tools make better selections and produce higher quality results."
+      },
+      {
+        wrong: "Hardcoding API keys in .mcp.json configuration",
+        wrongDesc: "Configuration files are committed to git. Hardcoded secrets get leaked.",
+        severity: "CRITICAL",
+        right: "Use ${ENV_VAR} environment variable expansion in MCP config",
+        rightDesc: "Secrets stay in the environment, not in version-controlled files."
+      }
+    ]
+  },
+
   // ===== DOMAIN 2 FLASHCARDS =====
   { type: "flashcard", domain: 2, color: "var(--d2)", title: "Domain 2 Flashcards", dataKey: "d2Flashcards" },
 
@@ -442,6 +528,37 @@ claude -p "Analyze this PR for security issues. Report only NEW issues." \\
     ]
   },
 
+  // ===== DOMAIN 3 ANTI-PATTERNS =====
+  {
+    type: "anti-patterns",
+    domain: 3,
+    color: "var(--d3)",
+    title: "Domain 3 Anti-Patterns",
+    patterns: [
+      {
+        wrong: "Putting personal preferences in project-level CLAUDE.md",
+        wrongDesc: "Personal preferences (editor settings, themes) should not be imposed on the whole team.",
+        severity: "MEDIUM",
+        right: "Use ~/.claude/CLAUDE.md for personal prefs, .claude/CLAUDE.md for team standards",
+        rightDesc: "Each configuration layer has a specific purpose and audience."
+      },
+      {
+        wrong: "Using commands for complex tasks that need context isolation",
+        wrongDesc: "Commands run in the current session context, polluting it with exploration noise.",
+        severity: "HIGH",
+        right: "Use skills with context: fork and allowed-tools restrictions",
+        rightDesc: "Forked context keeps exploration separate. Tool restrictions prevent accidental side effects."
+      },
+      {
+        wrong: "Same-session self-review in CI/CD pipelines",
+        wrongDesc: "The reviewer retains the generator's reasoning context, creating confirmation bias.",
+        severity: "CRITICAL",
+        right: "Use separate sessions for code generation and code review",
+        rightDesc: "A fresh session reviews the code objectively with no preconceptions."
+      }
+    ]
+  },
+
   // ===== DOMAIN 3 FLASHCARDS =====
   { type: "flashcard", domain: 3, color: "var(--d3)", title: "Domain 3 Flashcards", dataKey: "d3Flashcards" },
 
@@ -559,6 +676,37 @@ messages.append({"role":"user", "content": "There were errors. Please try again.
     ]
   },
 
+  // ===== DOMAIN 4 ANTI-PATTERNS =====
+  {
+    type: "anti-patterns",
+    domain: 4,
+    color: "var(--d4)",
+    title: "Domain 4 Anti-Patterns",
+    patterns: [
+      {
+        wrong: "Vague instructions like 'be thorough' or 'find all issues'",
+        wrongDesc: "Leads to over-flagging, false positives, and alert fatigue. Developers stop trusting the tool.",
+        severity: "CRITICAL",
+        right: "Provide explicit, measurable criteria: 'flag functions exceeding 50 lines'",
+        rightDesc: "Specific criteria produce consistent, actionable results that build trust."
+      },
+      {
+        wrong: "Assuming tool_use guarantees semantic correctness",
+        wrongDesc: "tool_use guarantees STRUCTURE only. Values inside the JSON may still be wrong.",
+        severity: "HIGH",
+        right: "Validate extracted values after tool_use with business rule checks",
+        rightDesc: "Schema compliance + semantic validation together ensure both correct format AND correct content."
+      },
+      {
+        wrong: "Generic retry messages: 'There were errors, please try again'",
+        wrongDesc: "Without specific error details, the model has no signal for what to fix.",
+        severity: "HIGH",
+        right: "Append specific error details: which field, what was wrong, expected vs actual",
+        rightDesc: "Specific feedback gives the model a clear correction target."
+      }
+    ]
+  },
+
   // ===== DOMAIN 4 FLASHCARDS =====
   { type: "flashcard", domain: 4, color: "var(--d4)", title: "Domain 4 Flashcards", dataKey: "d4Flashcards" },
 
@@ -669,8 +817,282 @@ messages.append({"role":"user", "content": "There were errors. Please try again.
     ]
   },
 
+  // ===== DOMAIN 5 ANTI-PATTERNS =====
+  {
+    type: "anti-patterns",
+    domain: 5,
+    color: "var(--d5)",
+    title: "Domain 5 Anti-Patterns",
+    patterns: [
+      {
+        wrong: "Progressive summarization of critical customer details",
+        wrongDesc: "Each round of summarization loses specifics: names, IDs, amounts, dates.",
+        severity: "CRITICAL",
+        right: "Use immutable 'case facts' blocks positioned at the start of context",
+        rightDesc: "Case facts are never summarized and sit in a high-recall position (beginning of context)."
+      },
+      {
+        wrong: "Aggregate accuracy metrics only (e.g., '95% overall')",
+        wrongDesc: "Aggregate metrics mask per-category failures. Invoices at 70% while receipts at 99% still averages 95%.",
+        severity: "CRITICAL",
+        right: "Track accuracy per document type (stratified metrics)",
+        rightDesc: "Per-type tracking reveals hidden failures that aggregate metrics conceal."
+      },
+      {
+        wrong: "No provenance tracking for multi-agent data",
+        wrongDesc: "When subagents provide conflicting data, there is no way to determine which source to trust.",
+        severity: "HIGH",
+        right: "Track source, confidence level, timestamp, and agent ID for all data",
+        rightDesc: "Provenance metadata enables informed conflict resolution and audit trails."
+      }
+    ]
+  },
+
   // ===== DOMAIN 5 FLASHCARDS =====
   { type: "flashcard", domain: 5, color: "var(--d5)", title: "Domain 5 Flashcards", dataKey: "d5Flashcards" },
+
+  // ===== SCENARIOS SECTION TITLE =====
+  {
+    type: "scenario-section",
+    color: "linear-gradient(135deg, #ea580c, #7c3aed)",
+    title: "Exam Scenario Walkthroughs",
+    subtitle: "4 of 6 appear on your exam · ~20 min review",
+    desc: "Each scenario tests specific architectural decisions, correct approaches, and common anti-patterns across the five exam domains."
+  },
+
+  // ===== SCENARIO 1: Customer Support Resolution Agent =====
+  {
+    type: "scenario",
+    num: 1,
+    color: "#ea580c",
+    title: "Customer Support Resolution Agent",
+    desc: "Design an AI-powered customer support agent that handles inquiries, resolves issues, and escalates complex cases. Tests Agent SDK usage, MCP tools, and escalation logic.",
+    tags: ["Agent SDK implementation", "Escalation pattern design", "Hook-based compliance enforcement", "Structured error handling"],
+    decisions: [
+      {
+        question: "How should the agentic loop terminate?",
+        correct: "Check stop_reason: continue on 'tool_use', exit on 'end_turn'",
+        antiPattern: "Parsing assistant text for 'done' or 'complete' keywords"
+      },
+      {
+        question: "How to enforce a $500 refund limit?",
+        correct: "PostToolUse hook that programmatically blocks refund tool calls above $500 and escalates",
+        antiPattern: "Adding 'never process refunds above $500' to the system prompt"
+      },
+      {
+        question: "When should the agent escalate to a human?",
+        correct: "Escalate on: explicit customer request, policy gaps, capability limits, business thresholds",
+        antiPattern: "Escalating based on negative sentiment or self-reported low confidence"
+      },
+      {
+        question: "How to preserve customer details in long conversations?",
+        correct: "Immutable 'case facts' block at the start of context with name, account ID, order, amounts",
+        antiPattern: "Progressive summarization that silently loses critical specifics over multiple rounds"
+      }
+    ],
+    domains: [
+      "D1: Agentic loop control via stop_reason",
+      "D1: Hooks for deterministic business rule enforcement",
+      "D2: Structured error responses from tool failures",
+      "D5: Case facts blocks for context preservation"
+    ],
+    strategy: "Focus on hook-based enforcement (not prompts) and case facts (not summarization). Every escalation question will try to trick you with sentiment-based triggers."
+  },
+
+  // ===== SCENARIO 2: Code Generation with Claude Code =====
+  {
+    type: "scenario",
+    num: 2,
+    color: "#059669",
+    title: "Code Generation with Claude Code",
+    desc: "Configure Claude Code for a development team workflow. Tests CLAUDE.md configuration, plan mode, slash commands, and iterative refinement strategies.",
+    tags: ["CLAUDE.md hierarchy setup", "Plan mode vs direct execution", "Custom slash commands and skills", "TDD iteration pattern"],
+    decisions: [
+      {
+        question: "Where should team coding standards go?",
+        correct: ".claude/CLAUDE.md (project-level, version-controlled, shared with team)",
+        antiPattern: "~/.claude/CLAUDE.md (user-level, personal only) or inline code comments"
+      },
+      {
+        question: "When to use plan mode vs direct execution?",
+        correct: "Plan mode for multi-file architectural changes; direct execution for simple, well-defined fixes",
+        antiPattern: "Always using plan mode (wasteful) or never using it (risky for complex changes)"
+      },
+      {
+        question: "How to handle complex refactoring that needs isolation?",
+        correct: "Use a skill with context: fork and allowed-tools restrictions",
+        antiPattern: "Using a simple command that runs in the main session context, polluting it with exploration noise"
+      },
+      {
+        question: "Best iterative refinement strategy?",
+        correct: "TDD iteration: write failing test, implement, verify, refine while keeping tests green",
+        antiPattern: "Vague instructions like 'make it better' without concrete verification criteria"
+      }
+    ],
+    domains: [
+      "D3: CLAUDE.md hierarchy (user vs project vs directory)",
+      "D3: Commands vs skills (isolation and tool restriction)",
+      "D3: Plan mode for complex tasks",
+      "D4: Explicit criteria and TDD iteration for refinement"
+    ],
+    strategy: "Purely about Claude Code configuration. Know the three configuration layers, when to use commands vs skills, and the TDD iteration pattern. The exam loves to test whether you put personal prefs in project config."
+  },
+
+  // ===== SCENARIO 3: Multi-Agent Research System =====
+  {
+    type: "scenario",
+    num: 3,
+    color: "#0ea5e9",
+    title: "Multi-Agent Research System",
+    desc: "Build a coordinator-subagent system for parallel research tasks. Tests multi-agent orchestration, context passing, error propagation, and result synthesis.",
+    tags: ["Hub-and-spoke architecture", "Context isolation and passing", "Error propagation patterns", "Information provenance and synthesis"],
+    decisions: [
+      {
+        question: "What architecture for parallel research tasks?",
+        correct: "Hub-and-spoke: coordinator delegates to specialized subagents with isolated contexts",
+        antiPattern: "Flat architecture where all agents share a global state or full conversation history"
+      },
+      {
+        question: "How to pass context from coordinator to subagents?",
+        correct: "Pass ONLY the context relevant to each subagent's specific task",
+        antiPattern: "Sharing the full coordinator conversation history with every subagent"
+      },
+      {
+        question: "How to handle conflicting data from different subagents?",
+        correct: "Track information provenance (source, confidence, timestamp) and resolve based on reliability",
+        antiPattern: "Arbitrarily choosing one result or averaging conflicting values without provenance"
+      },
+      {
+        question: "How to handle subagent failures?",
+        correct: "Structured error propagation: report what was attempted, error type, distinguish access failure from empty result",
+        antiPattern: "Silently returning empty results for failed lookups or generic 'operation failed' errors"
+      }
+    ],
+    domains: [
+      "D1: Hub-and-spoke multi-agent orchestration",
+      "D1: Context isolation for subagents",
+      "D5: Information provenance tracking",
+      "D5: Error propagation and access failure vs empty result"
+    ],
+    strategy: "The hardest scenario. Key traps: sharing full context with subagents (always wrong), silently dropping subagent failures (always wrong), and ignoring provenance when resolving conflicts."
+  },
+
+  // ===== SCENARIO 4: Developer Productivity with Claude =====
+  {
+    type: "scenario",
+    num: 4,
+    color: "#2563eb",
+    title: "Developer Productivity with Claude",
+    desc: "Build developer tools using the Claude Agent SDK with built-in tools and MCP servers. Tests tool selection, codebase exploration, and code generation workflows.",
+    tags: ["Built-in tool selection (Read, Write, Bash, Grep, Glob)", "MCP server integration", "Codebase exploration strategies", "Tool distribution across agents"],
+    decisions: [
+      {
+        question: "Agent has 18 tools and selects the wrong one. What to do?",
+        correct: "Reduce to 4-5 tools per agent, distribute the rest across specialized subagents",
+        antiPattern: "Making tool descriptions longer, fine-tuning the model, or switching to a larger model"
+      },
+      {
+        question: "Which built-in tool for reading a config file?",
+        correct: "Read tool (purpose-built for file reading)",
+        antiPattern: "Bash('cat config.json') — never use Bash when a dedicated tool exists"
+      },
+      {
+        question: "How to configure project-level MCP servers?",
+        correct: ".mcp.json with ${ENV_VAR} for secrets, version-controlled for the team",
+        antiPattern: "~/.claude.json (personal only) or hardcoding API keys in config files"
+      },
+      {
+        question: "Write vs Edit for modifying an existing file?",
+        correct: "Edit for targeted changes to existing files (preserves unchanged content)",
+        antiPattern: "Write replaces the ENTIRE file — using it on existing files loses content you did not include"
+      }
+    ],
+    domains: [
+      "D2: Tool distribution (4-5 per agent optimal)",
+      "D2: Built-in tool selection (Read/Write/Edit/Bash/Grep/Glob)",
+      "D2: MCP server configuration and secrets management",
+      "D2: Tool description best practices"
+    ],
+    strategy: "Tool-focused. Memorize the 6 built-in tools and when to use each. The '18 tools' question is almost guaranteed — always distribute across subagents. Never use Bash when a built-in tool exists."
+  },
+
+  // ===== SCENARIO 5: Claude Code for CI/CD =====
+  {
+    type: "scenario",
+    num: 5,
+    color: "#7c3aed",
+    title: "Claude Code for CI/CD",
+    desc: "Integrate Claude Code into continuous integration and delivery pipelines. Tests -p flag usage, structured output, batch API, and multi-pass code review.",
+    tags: ["-p flag for non-interactive mode", "Structured output with --output-format json", "Batch API with Message Batches", "Session isolation for generator vs reviewer"],
+    decisions: [
+      {
+        question: "How to run Claude Code in a CI pipeline?",
+        correct: "Use -p flag for non-interactive mode with --output-format json for structured results",
+        antiPattern: "Running in interactive mode or piping commands via stdin"
+      },
+      {
+        question: "How to review code that Claude generated?",
+        correct: "Use a SEPARATE session for review (fresh context, no confirmation bias)",
+        antiPattern: "Same-session self-review where the reviewer retains the generator's reasoning"
+      },
+      {
+        question: "Nightly code audit: synchronous or batch?",
+        correct: "Message Batches API for non-urgent tasks (50% cost savings, processes within 24h)",
+        antiPattern: "Synchronous requests for non-urgent tasks (2x the cost with no benefit)"
+      },
+      {
+        question: "How to enforce structured output from review?",
+        correct: "--json-schema flag to enforce specific output shape for automated processing",
+        antiPattern: "Parsing unstructured text output from the review with regex"
+      }
+    ],
+    domains: [
+      "D3: -p flag and --output-format json for CI/CD",
+      "D3: Session isolation (generator vs reviewer)",
+      "D3: Batch API for non-urgent processing (50% savings)",
+      "D4: Structured output via schemas"
+    ],
+    strategy: "Three facts to memorize: (1) -p for non-interactive, (2) NEVER self-review in the same session, (3) Batch API for non-urgent = 50% savings. These three cover most questions in this scenario."
+  },
+
+  // ===== SCENARIO 6: Structured Data Extraction =====
+  {
+    type: "scenario",
+    num: 6,
+    color: "#ca8a04",
+    title: "Structured Data Extraction",
+    desc: "Build a structured data extraction pipeline from unstructured documents. Tests JSON schemas, tool_use, validation-retry loops, and few-shot prompting.",
+    tags: ["JSON schema design for tool_use", "Validation-retry loop implementation", "Few-shot prompting for format consistency", "Field-level confidence and human review"],
+    decisions: [
+      {
+        question: "How to guarantee structured JSON output from extraction?",
+        correct: "tool_use with JSON schema + tool_choice forcing a specific tool",
+        antiPattern: "Prompting 'output as JSON' (not guaranteed) or post-processing with regex (fragile)"
+      },
+      {
+        question: "Does tool_use guarantee correctness?",
+        correct: "No — tool_use guarantees STRUCTURE only. Validate SEMANTICS separately with business rules.",
+        antiPattern: "Assuming tool_use output is always correct because it matched the schema"
+      },
+      {
+        question: "What to do when extraction validation fails?",
+        correct: "Append SPECIFIC error details (which field, what's wrong) and retry",
+        antiPattern: "Generic retry: 'there were errors, try again' (no signal for what to fix)"
+      },
+      {
+        question: "How to handle ambiguous document types?",
+        correct: "Include 'other' enum value + document_type_detail field; use 2-4 few-shot examples covering edge cases",
+        antiPattern: "Rigid enum without 'other' category (forces misclassification of unexpected types)"
+      }
+    ],
+    domains: [
+      "D4: tool_use for structured output (structure vs semantics)",
+      "D4: Validation-retry loops with specific error feedback",
+      "D4: Few-shot prompting (2-4 examples, edge case coverage)",
+      "D5: Per-document-type accuracy tracking (stratified metrics)"
+    ],
+    strategy: "Critical concept: tool_use guarantees structure, NOT semantics. Every question about extraction reliability will test this. Also know that validation retries need SPECIFIC errors, not generic messages."
+  },
 
   // ===== THANK YOU =====
   { type: "thankyou" }
