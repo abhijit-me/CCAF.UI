@@ -58,7 +58,7 @@ function ExamInfoSlide() {
             { num: "60", label: "Multiple-choice questions" },
             { num: "120", label: "Minutes · online proctored" },
             { num: "720", label: "Scaled score to pass (of 1000)" },
-            { num: "$99", label: "Fee (waived for partners)" },
+            { num: "$99", label: "Fee (waived for first 5000)" },
           ].map((s, i) => (
             <div key={i} className={`exam-stat animate-in-delay-${i+1}`}>
               <div className="number">{s.num}</div>
@@ -70,7 +70,7 @@ function ExamInfoSlide() {
           <strong>Exam mechanics:</strong> One correct answer + three distractors each · no penalty for guessing — never leave a blank. Questions hand you a production symptom and ask for the <em>most effective</em> fix.
         </div>
         <div className="callout callout-tip animate-in-delay-4">
-          <strong>Green-light rule:</strong> Score 900+ on the Practice Exam first — that's your go/no-go signal. 1 attempt, then a 6-month cooldown.
+          <strong>Green-light rule:</strong> Score 900+ on the Practice Exam first — that's your go/no-go signal. If you do not clear, you need to wait for 6 months.
         </div>
         <table className="slide-table animate-in-delay-4">
           <thead><tr><th>Domain</th><th>Weight</th><th>≈ Questions</th></tr></thead>
@@ -315,8 +315,9 @@ function ScenarioSlide({ data }) {
         <div className="callout callout-key sc-callout animate-in-delay-3">
           <strong>Domains — </strong>{data.domains.join(' · ')}
         </div>
-        <div className="callout callout-tip sc-callout animate-in-delay-4">
-          <strong>Exam Strategy — </strong>{data.strategy}
+        <div className="example-box animate-in-delay-4">
+          <h4>Exam Strategy</h4>
+          <p>{data.strategy}</p>
         </div>
       </div>
     </>
