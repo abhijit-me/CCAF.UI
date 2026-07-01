@@ -484,6 +484,7 @@ html, body, #root {
   font-family: var(--mono);
   font-size: 0.78rem;
   line-height: 1.7;
+  min-height: 128px;
   color: #334155;
   white-space: pre-wrap;
   word-break: break-word;
@@ -868,72 +869,8 @@ html, body, #root {
 }
 
 /* ============ DISCLAIMER SLIDE ============ */
-.disclaimer-slide {
-  text-align: center;
-  position: relative;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  max-width: 680px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.disclaimer-icon {
-  font-size: 3rem;
-  margin-bottom: 18px;
-  line-height: 1;
-}
-
-.disclaimer-slide h2 {
-  font-size: 2.6rem;
-  font-weight: 800;
-  margin-bottom: 28px;
-  background: linear-gradient(135deg, #d97706, #ea580c);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.disclaimer-body {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 28px 34px;
-  text-align: left;
-  box-shadow: 0 4px 20px rgba(37,99,235,0.08);
-  margin-bottom: 20px;
-  width: 100%;
-}
-
-.disclaimer-body p {
-  font-size: 1.05rem;
-  color: var(--muted);
-  line-height: 1.85;
-  margin-bottom: 14px;
-}
-
-.disclaimer-body p:last-child {
-  margin-bottom: 0;
-}
-
-.disclaimer-body strong {
-  color: var(--text);
-  font-weight: 600;
-}
-
-.disclaimer-badge {
-  font-size: 0.78rem;
-  color: var(--amber);
-  background: rgba(217,119,6,0.08);
-  border: 1px solid rgba(217,119,6,0.25);
-  padding: 10px 24px;
-  border-radius: 30px;
-  font-family: var(--mono);
-  letter-spacing: 0.04em;
-}
+/* Disclaimer now uses standard slide-header and slide-content classes */
+/* Custom styles removed - using consistent callout styling instead */
 
 /* ============ ANTI-PATTERNS SLIDE ============ */
 .ap-list {

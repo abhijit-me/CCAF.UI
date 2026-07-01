@@ -23,24 +23,26 @@ function TitleSlide() {
 // ===== DISCLAIMER SLIDE =====
 function DisclaimerSlide() {
   return (
-    <div className="disclaimer-slide">
-      <div className="disclaimer-icon animate-in">⚠️</div>
-      <h2 className="animate-in-delay-1">Disclaimer</h2>
-      <div className="disclaimer-body animate-in-delay-2">
-        <p>
+    <>
+      <div className="slide-header animate-in">
+        <h2>Disclaimer</h2>
+        <p className="subtitle">Important notes about these study materials</p>
+      </div>
+      <div className="slide-content">
+        <div className="callout callout-warn animate-in-delay-1">
           The content in these slides is <strong>not a complete study guide</strong> for the CCA-F certification exam.
-        </p>
-        <p>
+        </div>
+        <div className="callout callout-key animate-in-delay-2">
           These pages contain <strong>important points, key tips, and common pitfalls</strong> carefully distilled from the exam domains — designed to act as a <strong>quick refresher</strong> before you sit the certification exam.
-        </p>
-        <p>
-          For thorough preparation, please refer to the official Anthropic documentation, the full exam guide, and other comprehensive study materials.
-        </p>
+        </div>
+        <div className="callout callout-tip animate-in-delay-3">
+          <strong>For complete preparation:</strong> Please refer to the official Anthropic documentation, the full exam guide, and other comprehensive study materials.
+        </div>
+        <div className="callout callout-warn animate-in-delay-4" style={{marginTop: 20}}>
+          <strong>Best used as a final review · not as a primary study resource</strong>
+        </div>
       </div>
-      <div className="disclaimer-badge animate-in-delay-3">
-        Best used as a final review · not as a primary study resource
-      </div>
-    </div>
+    </>
   );
 }
 
