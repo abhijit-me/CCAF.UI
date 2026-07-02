@@ -58,9 +58,10 @@ function ExamInfoSlide() {
         <div className="exam-grid">
           {[
             { num: "60", label: "Multiple-choice questions" },
-            { num: "120", label: "Minutes · online proctored" },
-            { num: "720", label: "Scaled score to pass (of 1000)" },
-            { num: "$99", label: "Fee (waived for first 5000)" },
+            { num: "120", label: "Minutes · Proctored" },
+            { num: "720", label: "Score to pass (of 1000)" },
+            { num: "$125", label: "Fee (waived for partners)" },
+            { num: "12", label: "Months Validity" },
           ].map((s, i) => (
             <div key={i} className={`exam-stat animate-in-delay-${i+1}`}>
               <div className="number">{s.num}</div>
@@ -72,15 +73,15 @@ function ExamInfoSlide() {
           <strong>Exam mechanics:</strong> One correct answer + three distractors each · no penalty for guessing — never leave a blank. Questions hand you a production symptom and ask for the <em>most effective</em> fix.
         </div>
         <div className="callout callout-tip animate-in-delay-4">
-          <strong>Green-light rule:</strong> Score 900+ on the Practice Exam first — that's your go/no-go signal. If you do not clear, you need to wait for 6 months.
+          <strong>Green-light rule:</strong> Score 900+ on the Practice Exam first — that's your go/no-go signal. If you don't pass, you can retake the exam after a short waiting period: 14 days after your first attempt, 30 days after your second, and 90 days after your third. You can take up to 4 attempts per exam in any rolling 12-month period.
         </div>
         <table className="slide-table animate-in-delay-4">
           <thead><tr><th>Domain</th><th>Weight</th><th>≈ Questions</th></tr></thead>
           <tbody>
             <tr><td>D1 · Agentic Architecture</td><td>27%</td><td>~16</td></tr>
+            <tr><td>D2 · Tool Design & MCP</td><td>18%</td><td>~11</td></tr>
             <tr><td>D3 · Claude Code Config</td><td>20%</td><td>~12</td></tr>
             <tr><td>D4 · Prompt Engineering</td><td>20%</td><td>~12</td></tr>
-            <tr><td>D2 · Tool Design & MCP</td><td>18%</td><td>~11</td></tr>
             <tr><td>D5 · Context Management</td><td>15%</td><td>~9</td></tr>
           </tbody>
         </table>
