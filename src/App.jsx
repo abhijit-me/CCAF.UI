@@ -100,13 +100,13 @@ function TOCSlide({ goToSlide }) {
     { id: 5, title: "Context Management & Reliability", weight: "15%", color: "var(--d5)" },
   ];
 
-  const domainSlideIndices = [4, 15, 24, 33, 42];
+  const domainSlideIndices = [4, 15, 24, 33, 42, 51];
 
   return (
     <>
       <div className="slide-header animate-in">
         <h2>Contents</h2>
-        <p className="subtitle">Five domains covering 28 task statements</p>
+        <p className="subtitle">Five domains and exam scenarios</p>
       </div>
       <div className="slide-content" style={{justifyContent: 'center'}}>
         <ul className="toc-list">
@@ -123,6 +123,17 @@ function TOCSlide({ goToSlide }) {
               </div>
             </li>
           ))}
+          <li
+            key="6"
+            className={`toc-item animate-in-delay-6`}
+            onClick={() => goToSlide(51)}
+          >
+            <div className="toc-badge" style={{background: "#0ea5e9"}}>X</div>
+            <div className="toc-text">
+              <h3>Exam Walkthrough Scenarios</h3>
+              <span>4 of 6 appear on your exam</span>
+            </div>
+          </li>
         </ul>
       </div>
     </>
