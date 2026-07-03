@@ -1003,7 +1003,7 @@ html, body, #root {
     width: 100%;
     min-width: 100%;
   }
-  .slide { padding: 30px 24px; }
+  .slide { padding: 32px 24px 48px 24px; }
   .title-main { font-size: 2.2rem; }
   .exam-grid { grid-template-columns: repeat(3, 1fr); }
   .slide-header h2 { font-size: 1.6rem; }

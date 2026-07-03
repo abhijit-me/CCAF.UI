@@ -383,6 +383,15 @@ function Particles() {
 export default function App() {
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState('right');
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile/tablet browsers
+  useEffect(() => {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isMobileDevice = /iPad|iPhone|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(userAgent) ||
+                           (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
+    setIsMobile(isMobileDevice);
+  }, []);
 
   const goTo = useCallback((idx) => {
     if (idx === current || idx < 0 || idx >= slides.length) return;
@@ -442,7 +451,9 @@ export default function App() {
       <div className="progress-bar" style={{width: `${progress}%`}} />
       {slides.map((slide, i) => renderSlide(slide, i))}
       <div className="slide-counter">{current + 1} / {slides.length}</div>
-      <div className="nav-hint">← → Arrow keys to navigate</div>
+      <div className="nav-hint">
+        {isMobile ? '← → Tap edges to navigate' : '← → Arrow keys to navigate'}
+      </div>
       <div className="tap-zone tap-zone-left" onClick={prev} />
       <div className="tap-zone tap-zone-right" onClick={next} />
     </div>
