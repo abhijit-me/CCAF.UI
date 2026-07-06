@@ -5,8 +5,8 @@ export const d1Flashcards = [
   { q: "Do subagents inherit the coordinator's context?", a: "No. Subagents start with a blank, isolated context. Pass everything they need explicitly in the prompt." },
   { q: "How do you spawn subagents in parallel?", a: "Emit multiple Task tool calls in a single coordinator response — not across separate turns." },
   { q: "Shared memory, Global state, Inherited conversation — what is the ONLY channel for passing context to a subagent?", a: "The prompt" },
-  { q: "For deterministic compliance on money, identity, or policy rules, you enforce with hooks or prerequisite gates rather than probabilistic prompts.", a: "prerequisite gates" },
-  { q: "Which hook event transforms tool results — such as normalizing timestamps to ISO-8601 — before the model ever sees them?", a: "PostToolUse" },
+  { q: "How do you handle an outgoing tool call to block it or enforce compliance BEFORE it runs (e.g. block a refund over $500)?", a: "Use PreToolUse hook" },
+  { q: "How do you transform tool results — such as normalizing timestamps to ISO-8601 — before the model ever sees them?", a: "Use PostToolUse hook" },
   { q: "Which session feature branches independently from a shared baseline so you can explore divergent approaches without cross-pollution?", a: "fork_session" },
 ];
 
