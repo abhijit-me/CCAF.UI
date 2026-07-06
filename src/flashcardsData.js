@@ -1,13 +1,13 @@
 // Domain 1 Flashcards
 export const d1Flashcards = [
-  { q: "What two values of stop_reason drive the agentic loop?", a: "tool_use → continue (execute tools, append results as user message). end_turn → terminate. Claude decides — never text-parse." },
+  { q: "In the agentic loop, which stop_reason value means 'execute tools and continue', and which means 'terminate'?", a: "tool_use (continue) · end_turn (terminate)" },
+  { q: "After a tool executes, its results must be appended back to the conversation under which message role?", a: "user (user-role message)" },
   { q: "Do subagents inherit the coordinator's context?", a: "No. Subagents start with a blank, isolated context. Pass everything they need explicitly in the prompt." },
   { q: "How do you spawn subagents in parallel?", a: "Emit multiple Task tool calls in a single coordinator response — not across separate turns." },
-  { q: "Hook vs. prompt for a hard requirement?", a: "Use a hook / prerequisite gate — deterministic. Prompts are probabilistic and have a non-zero failure rate." },
-  { q: "Subagents succeed but coverage has gaps — root cause?", a: "The coordinator's task decomposition is too narrow. Look up the chain, not at the subagents." },
-  { q: "resume vs. fork_session?", a: "resume continues with full context. fork_session branches independently from a shared baseline for divergent exploration." },
-  { q: "After a tool runs, where does its result go?", a: "Appended as a user-role message with tool_result blocks keyed to each tool_use_id. Skip this → stale state." },
-  { q: "What are the three loop anti-patterns?", a: "(1) Parsing text for 'done'; (2) iteration cap as primary stop; (3) checking for text as completion signal. Only stop_reason matters." },
+  { q: "Shared memory, Global state, Inherited conversation — what is the ONLY channel for passing context to a subagent?", a: "The prompt" },
+  { q: "For deterministic compliance on money, identity, or policy rules, you enforce with hooks or prerequisite gates rather than probabilistic prompts.", a: "prerequisite gates" },
+  { q: "Which hook event transforms tool results — such as normalizing timestamps to ISO-8601 — before the model ever sees them?", a: "PostToolUse" },
+  { q: "Which session feature branches independently from a shared baseline so you can explore divergent approaches without cross-pollution?", a: "fork_session" },
 ];
 
 // Domain 2 Flashcards

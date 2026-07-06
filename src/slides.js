@@ -228,6 +228,27 @@ export const slides = [
         severity: "HIGH",
         right: "Use structured criteria and programmatic checks for escalation decisions",
         rightDesc: "Programmatic checks based on observable facts are reliable and auditable."
+      },
+      {
+        wrong: "Few-shot examples in the system prompt for multi-step reasoning",
+        wrongDesc: "Examples help models recognize patterns but aren't robust enough for complex, multi-step reasoning.",
+        severity: "MEDIUM",
+        right: "Use Programmatic Tool Calling to handle multi-step reasoning.",
+        rightDesc: "PTC offloads pagination to executable code, ensuring reliable multi-step iteration."
+      },
+      {
+        wrong: "Single agent using async tool calls for independent subtasks",
+        wrongDesc: "Async tool calls within one agent don't enable parallel reasoning for independent subtasks.",
+        severity: "MEDIUM",
+        right: "Decompose into parallel worker agents with shared context",
+        rightDesc: "Split into multiple agents that can run concurrently, each with its own context and reasoning path."
+      },
+      {
+        wrong: "Handling tool failures via retry prompts or a PreToolUse health-check",
+        wrongDesc: "Prompt-based retry logic waste context, while health checks add latency.",
+        severity: "MEDIUM",
+        right: "Implement retry logic with exponential backoff and jitter inside the tool",
+        rightDesc: "Handle transient network errors at the tool/API layer so models see only final success or failure."
       }
     ]
   },
