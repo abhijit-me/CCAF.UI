@@ -28,10 +28,10 @@ export const d3Flashcards = [
   { q: "Convention for files scattered across directories?", a: ".claude/rules/ with YAML paths: globs. Directory CLAUDE.md can't follow scattered files." },
   { q: "What does context: fork do in SKILL.md?", a: "Runs the skill in an isolated sub-agent context so verbose output doesn't pollute the main conversation." },
   { q: "How to run Claude Code in CI without hanging?", a: "-p/--print (non-interactive) + --output-format json + --json-schema." },
-  { q: "Command vs. skill — when each?", a: "Command = simple prompt template in main session. Skill = complex, can fork context and restrict tools." },
+  { q: "Simple prompt template in main session. Complex tasks with forked sessions and restricted tools. When to use - Command / Skill?", a: "Command = simple prompt template in main session. Skill = Complex tasks with forked sessions and restricted tools." },
   { q: "CLAUDE.md precedence when layers conflict?", a: "NO strict precedence — all files concatenated. Conflicts resolve arbitrarily. Use settings.json or hooks for enforcement." },
   { q: "Why does self-review fail in CI?", a: "Reviewer retains generator's reasoning → confirmation bias. Use a separate fresh session." },
-  { q: "Plan mode vs. direct execution?", a: "Plan for multi-file/architectural/complex. Direct for simple, well-scoped, obvious fixes with clear traces." },
+  { q: "For multi-file, complex architecture OR Simple, well-scoped, obvious fixes - Plan mode vs. Direct execution?", a: "Plan mode for multi-file, complex architecture. Direct execution for simple, well-scoped, obvious fixes." },
 ];
 
 // Domain 4 Flashcards

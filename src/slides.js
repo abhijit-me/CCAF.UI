@@ -183,7 +183,8 @@ export const slides = [
       "<strong>03:</strong> stop_reason is the only loop signal — never text-parse",
       "<strong>04:</strong> Subagents are blank slates — pass context explicitly",
       "<strong>05:</strong> Attribute failures to the right layer — coordinator vs subagent vs tool",
-      "<strong>06:</strong> Structured everything — errors, handoffs, claim-source mappings"
+      "<strong>06:</strong> Structured everything — errors, handoffs, claim-source mappings",
+      "<strong>07:</strong> If tool_use_id mismatches - API returns 400 Bad Request."
     ]
   },
 
@@ -448,7 +449,9 @@ export const slides = [
       "<strong>Directory:</strong> CLAUDE.md in subdirectory — applies within that subtree",
       "<strong>@./path imports</strong> inline referenced files at load time (no @import keyword)",
       "<strong>CLAUDE.local.md</strong> — sits next to CLAUDE.md, gitignored, personal tweaks",
-      "<strong>.claude/rules/</strong> holds topic-specific rule files vs. one monolith"
+      "<strong>.claude/rules/</strong> holds topic-specific rule files vs. one monolith",
+      "<strong>/memory</strong> — Verify what rules are loaded.",
+      "<strong>Enterprise policies</strong> — Use MDM or OS level policies to deploy settings."
     ],
     callout: { type: "key", text: "CLAUDE.md is NOT strict-precedence: all applicable files are concatenated into context; none 'overrides' another. It's delivered as a user message, not system prompt — guidance the model usually follows, not guaranteed enforcement." },
     example: { title: "Team Config Trap", text: "Priya puts conventions in ~/.claude/CLAUDE.md. New hire Rohan clones the repo — gets nothing. Why? It's user scope. Team-shared rules must live in project-level .claude/CLAUDE.md (committed)." }
@@ -513,7 +516,8 @@ paths: ["src/api/**", "src/middleware/**"]
       "<strong>Concrete I/O examples</strong> are the most effective way to pin down transformations",
       "<strong>TDD iteration:</strong> write failing test → implement → run tests → refine",
       "<strong>Interview pattern:</strong> have Claude ask questions to surface missed considerations",
-      "<strong>Explore subagent</strong> isolates verbose discovery, preserves main-conversation context"
+      "<strong>Explore subagent</strong> isolates verbose discovery, preserves main-conversation context",
+      "<strong>Interdependent tasks</strong> - group into a single prompt, <strong>Independent tasks</strong> in separate prompts."
     ],
     callout: { type: "tip", text: "The cue: is complexity already stated or hypothetical? Dozens of files / service boundaries → plan mode. Simple bug with clear trace → direct execution." }
   },
@@ -576,6 +580,13 @@ claude -p "Analyze this PR for security issues. Report only NEW issues." \\
         severity: "CRITICAL",
         right: "Use separate sessions for code generation and code review",
         rightDesc: "A fresh session reviews the code objectively with no preconceptions."
+      },
+      {
+        wrong: "Auto deploying ~/.claude/settings.json for enterprise policies",
+        wrongDesc: "They aren't centrally managed or enforced. Can be changed by user.",
+        severity: "MEDIUM",
+        right: "Use MDM or OS-managed settings",
+        rightDesc: "Enforces configuration for all users without manual setup."
       }
     ]
   },
