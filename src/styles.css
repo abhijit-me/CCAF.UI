@@ -503,6 +503,49 @@ html, body, #root {
   opacity: 0.5;
 }
 
+/* ============ MULTI-SECTION CONTENT SLIDES ============ */
+.content-section {
+  width: 100%;
+}
+
+.content-section + .content-section {
+  margin-top: 22px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+
+.section-heading {
+  font-size: 1.15rem;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+
+.section-text {
+  font-size: 1rem;
+  color: var(--muted);
+  font-style: italic;
+  line-height: 1.7;
+  margin: 10px 0;
+}
+
+.section-text strong {
+  color: var(--text);
+  font-style: normal;
+}
+
+.section-text code {
+  font-family: var(--mono);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 0.9em;
+  color: var(--accent);
+  font-style: normal;
+}
+
 /* ============ CALLOUT BOXES ============ */
 .callout {
   border-radius: 14px;
@@ -841,6 +884,74 @@ html, body, #root {
   .sc-decisions {
     grid-template-columns: 1fr;
   }
+}
+
+/* ============ EXAM STRATEGY SLIDE ============ */
+.strategy-steps {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.strategy-step {
+  display: flex;
+  gap: 20px;
+}
+
+.strategy-step-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
+.strategy-step-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.15);
+  flex-shrink: 0;
+}
+
+.strategy-step-line {
+  width: 2px;
+  flex: 1;
+  min-height: 32px;
+  background: linear-gradient(180deg, rgba(37,99,235,0.35), rgba(37,99,235,0.08));
+  margin: 4px 0;
+}
+
+.strategy-step-body {
+  padding-bottom: 22px;
+}
+
+.strategy-step-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.strategy-step-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.strategy-step-desc {
+  font-size: 0.92rem;
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 90%;
 }
 
 /* ============ THANK YOU SLIDE ============ */

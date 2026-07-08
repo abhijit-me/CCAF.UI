@@ -100,7 +100,7 @@ function TOCSlide({ goToSlide }) {
     { id: 5, title: "Context Management & Reliability", weight: "15%", color: "var(--d5)" },
   ];
 
-  const domainSlideIndices = [4, 15, 24, 33, 42, 51];
+  const domainSlideIndices = [4, 16, 26, 35, 44, 53];
 
   return (
     <>
@@ -126,7 +126,7 @@ function TOCSlide({ goToSlide }) {
           <li
             key="6"
             className={`toc-item animate-in-delay-6`}
-            onClick={() => goToSlide(51)}
+            onClick={() => goToSlide(53)}
           >
             <div className="toc-badge" style={{background: "#0ea5e9"}}>X</div>
             <div className="toc-text">
@@ -152,6 +152,55 @@ function DomainTitleSlide({ data }) {
   );
 }
 
+// ===== CONTENT SLIDE — one block of a section (table/text/bullets/code/callout/example) =====
+function ContentBlock({ data, color, delayOffset = 1 }) {
+  return (
+    <>
+      {data.table && (
+        <table className={`slide-table animate-in-delay-${delayOffset}`}>
+          <thead><tr>{data.table.headers.map((h,i) => <th key={i}>{h}</th>)}</tr></thead>
+          <tbody>{data.table.rows.map((row,i) => (
+            <tr key={i}>{row.map((cell,j) => <td key={j}>{cell}</td>)}</tr>
+          ))}</tbody>
+        </table>
+      )}
+      {data.bullets && (
+        <ul className={`bullet-list animate-in-delay-${delayOffset}`}>
+          {data.bullets.map((b, i) => (
+            <li key={i} dangerouslySetInnerHTML={{__html: b}} />
+          ))}
+        </ul>
+      )}
+      {data.text && (
+        <p className={`section-text animate-in-delay-${delayOffset}`} dangerouslySetInnerHTML={{__html: data.text}} />
+      )}
+      {data.principles && (
+        <div className={`principles-list animate-in-delay-${delayOffset}`}>
+          {data.principles.map((p, i) => (
+            <div key={i} className="callout callout-key principle-box">
+              <span dangerouslySetInnerHTML={{__html: p}} />
+            </div>
+          ))}
+        </div>
+      )}
+      {data.code && (
+        <div className={`code-block animate-in-delay-${Math.min(delayOffset + 1, 5)}`}>{data.code}</div>
+      )}
+      {data.callout && (
+        <div className={`callout callout-${data.callout.type} animate-in-delay-${Math.min(delayOffset + 2, 5)}`}>
+          <span dangerouslySetInnerHTML={{__html: data.callout.text}} />
+        </div>
+      )}
+      {data.example && (
+        <div className={`example-box animate-in-delay-${Math.min(delayOffset + 3, 5)}`}>
+          <h4>{data.example.title}</h4>
+          <p>{data.example.text}</p>
+        </div>
+      )}
+    </>
+  );
+}
+
 // ===== CONTENT SLIDE =====
 function ContentSlide({ data }) {
   return (
@@ -161,43 +210,17 @@ function ContentSlide({ data }) {
         <h2>{data.title}</h2>
       </div>
       <div className="slide-content">
-        {data.table && (
-          <table className="slide-table animate-in-delay-1">
-            <thead><tr>{data.table.headers.map((h,i) => <th key={i}>{h}</th>)}</tr></thead>
-            <tbody>{data.table.rows.map((row,i) => (
-              <tr key={i}>{row.map((cell,j) => <td key={j}>{cell}</td>)}</tr>
-            ))}</tbody>
-          </table>
-        )}
-        {data.bullets && (
-          <ul className="bullet-list animate-in-delay-1">
-            {data.bullets.map((b, i) => (
-              <li key={i} dangerouslySetInnerHTML={{__html: b}} />
-            ))}
-          </ul>
-        )}
-        {data.principles && (
-          <div className="principles-list animate-in-delay-1">
-            {data.principles.map((p, i) => (
-              <div key={i} className="callout callout-key principle-box">
-                <span dangerouslySetInnerHTML={{__html: p}} />
-              </div>
-            ))}
-          </div>
-        )}
-        {data.code && (
-          <div className="code-block animate-in-delay-2">{data.code}</div>
-        )}
-        {data.callout && (
-          <div className={`callout callout-${data.callout.type} animate-in-delay-3`}>
-            <span dangerouslySetInnerHTML={{__html: data.callout.text}} />
-          </div>
-        )}
-        {data.example && (
-          <div className="example-box animate-in-delay-4">
-            <h4>{data.example.title}</h4>
-            <p>{data.example.text}</p>
-          </div>
+        {data.sections ? (
+          data.sections.map((section, i) => (
+            <div key={i} className="content-section">
+              {section.heading && (
+                <h3 className="section-heading animate-in-delay-1" style={{color: data.color}}>{section.heading}</h3>
+              )}
+              <ContentBlock data={section} color={data.color} delayOffset={1} />
+            </div>
+          ))
+        ) : (
+          <ContentBlock data={data} color={data.color} delayOffset={1} />
         )}
       </div>
     </>
@@ -338,6 +361,36 @@ function ScenarioSlide({ data }) {
   );
 }
 
+// ===== EXAM STRATEGY SLIDE =====
+function ExamStrategySlide({ data }) {
+  return (
+    <>
+      <div className="slide-header animate-in">
+        <div className="task-badge" style={{background: 'var(--accent)'}}>Exam Strategy</div>
+        <h2>{data.title}</h2>
+        <p className="subtitle">{data.subtitle}</p>
+      </div>
+      <div className="slide-content">
+        <div className="strategy-steps">
+          {data.steps.map((s, i) => (
+            <div key={i} className={`strategy-step animate-in-delay-${Math.min(i + 1, 5)}`}>
+              <div className="strategy-step-marker">
+                <span className="strategy-step-dot" />
+                {i < data.steps.length - 1 && <span className="strategy-step-line" />}
+              </div>
+              <div className="strategy-step-body">
+                <span className="strategy-step-label">Step {i + 1}</span>
+                <h3 className="strategy-step-title">{s.title}</h3>
+                <p className="strategy-step-desc">{s.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
 // ===== THANK YOU SLIDE =====
 function ThankYouSlide() {
   return (
@@ -434,6 +487,7 @@ export default function App() {
       case 'anti-patterns': content = <AntiPatternsSlide data={slide} />; break;
       case 'scenario-section': content = <ScenarioSectionSlide data={slide} />; break;
       case 'scenario': content = <ScenarioSlide data={slide} />; break;
+      case 'exam-strategy': content = <ExamStrategySlide data={slide} />; break;
       case 'thankyou': content = <ThankYouSlide />; break;
       default: content = null;
     }

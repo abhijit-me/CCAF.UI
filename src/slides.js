@@ -165,6 +165,24 @@ export const slides = [
     type: "content",
     domain: 1,
     color: "var(--d1)",
+    task: "Key Components",
+    title: "Claude Agent SDK — Key Components",
+    table: {
+      headers: ["Component", "Purpose"],
+      rows: [
+        ["AgentDefinition", "Declares an agent's identity, system prompt, and available tools."],
+        ["allowedTools", "Restricts which tools an agent can access. Keep to 4–5 per agent."],
+        ["Task tool", "How the coordinator delegates to a subagent. The subagent runs in its own isolated context."],
+        ["Handoffs", "Transfer control between agents — the receiving agent has NO access to the sending agent's history. (Same blank-slate rule as subagents.)"],
+        ["PreToolUse / PostToolUse hooks", "Deterministic enforcement before / after a tool runs. Cannot be bypassed."]
+      ]
+    },
+    callout: { type: "warn", text: "<strong>stop_reason values beyond the two big ones:</strong> \"max_tokens\" means the token limit was hit mid-task — handle it as an error (truncate, restart with a summary, or raise) rather than treating it as completion." }
+  },
+  {
+    type: "content",
+    domain: 1,
+    color: "var(--d1)",
     task: "Principles",
     title: "Domain 1 Patterns & Principles",
     table: {
@@ -372,6 +390,40 @@ export const slides = [
       "Explore incrementally: Grep → Read → Grep callers. <strong>Never read all files upfront</strong>"
     ],
     callout: { type: "key", text: "Never Bash when a built-in exists. Grep for content, Glob for paths, Read for known files, Edit for changes, Bash only for npm test / installs." }
+  },
+  {
+    type: "content",
+    domain: 2,
+    color: "var(--d2)",
+    task: "Key Components",
+    title: "MCP — The Three-Layer Model",
+    sections: [
+      {
+        table: {
+          headers: ["Layer", "Role", "Example"],
+          rows: [
+            ["Client", "Connects to servers, routes tool calls", "Claude Desktop, IDE extension, your app"],
+            ["Host", "The application process managing the client lifecycle", "The desktop-app process itself"],
+            ["Server", "Exposes tools, resources & prompts", "Postgres, Slack, GitHub, file system, CRM"]
+          ]
+        },
+        text: "Transport is <strong>JSON-RPC 2.0</strong> over <strong>stdio</strong> or <strong>HTTP+SSE</strong>. Config: <code>.mcp.json</code> (project, git-shared) vs <code>~/.claude.json</code> (personal) — secrets via <code>${ENV_VAR}</code>, never hardcoded. <strong>Check community MCP servers before building a custom one.</strong>"
+      },
+      {
+        heading: "Structured Error Shape & the Empty-vs-Failure Test",
+        code: `{ "errorCategory": "authentication"|"not_found"|"rate_limit"|"validation"|"internal",
+  "isRetryable": true, "retryAfterMs": 5000,
+  "partialResult": { ... }, "suggestion": "Check API key permissions" }`,
+        table: {
+          headers: ["Situation", "Verdict & Action"],
+          rows: [
+            ["Search returns 0 results · DB query empty set · filter matches nothing", "VALID EMPTY (isError:false) — accept; absence IS the answer"],
+            ["401 Unauthorized · network timeout · rate-limit 429 · expired token", "ACCESS FAILURE (isError:true) — retry (respect Retry-After) or escalate"]
+          ]
+        },
+        callout: { type: "warn", text: "<strong>The most-tested trap:</strong> a tool that silently returns [] on a network failure makes the agent think \"no data exists\" when the truth is \"couldn't even check.\" Never collapse an access failure into an empty result." }
+      }
+    ]
   },
   {
     type: "content",
@@ -1124,6 +1176,39 @@ messages.append({"role":"user", "content": "There were errors. Please try again.
       "D5: Per-document-type accuracy tracking (stratified metrics)"
     ],
     strategy: "Critical concept: tool_use guarantees structure, NOT semantics. Every question about extraction reliability will test this. Also know that validation retries need SPECIFIC errors, not generic messages."
+  },
+
+  // ===== EXAM STRATEGY =====
+  {
+    type: "exam-strategy",
+    title: "The 6-Step Decision Filter for \"Most Effective Fix\" Questions",
+    subtitle: "Run every scenario question through this in order. The first rule that applies usually picks the answer.",
+    steps: [
+      {
+        title: "Find the root cause in the logs/symptoms",
+        desc: "The question always describes a symptom. Map it to a layer: tool description, coordinator decomposition, subagent execution, loop control, or prompt criteria. Fix the layer that's actually broken."
+      },
+      {
+        title: "Prefer the simplest fix that addresses that cause",
+        desc: "If an option adds a classifier, an ML model, a bigger model, sentiment analysis, or caching before simpler prompt/description/criteria fixes are tried — it's almost always the over-engineered distractor."
+      },
+      {
+        title: "Hard requirement? → deterministic, not probabilistic",
+        desc: "Money, identity, compliance, tool-ordering → hooks / prerequisite gates / programmatic enforcement. A \"strengthen the prompt\" or \"add few-shot examples\" option for a guaranteed requirement is a trap."
+      },
+      {
+        title: "Loop control? → stop_reason only",
+        desc: "Any option that text-parses the model's words, or uses an iteration cap as the primary stop, is wrong."
+      },
+      {
+        title: "Scope question? → match sharing need to scope",
+        desc: "Team-shared → project (committed). Personal → user (~/.claude). Scattered files → .claude/rules/ globs, not directory CLAUDE.md."
+      },
+      {
+        title: "Errors / synthesis? → structured + provenance-preserving",
+        desc: "Structured errors with category + retryability beat generic strings. Conflicting sources → annotate with attribution, never pick one. Independent review beats self-review."
+      }
+    ]
   },
 
   // ===== THANK YOU =====
