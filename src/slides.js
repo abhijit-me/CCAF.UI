@@ -359,13 +359,13 @@ export const slides = [
     title: "Integrate MCP Servers",
     bullets: [
       "<strong>Project .mcp.json</strong> (shared, version-controlled) vs. <strong>~/.claude.json</strong> (personal)",
-      "<strong>Env-var expansion</strong> (${'{'}GITHUB_TOKEN{'}'}) keeps secrets out of source control",
+      "<strong>Env-var expansion</strong> (${GITHUB_TOKEN}) keeps secrets out of source control",
       "All configured servers' tools <strong>discovered at connection time</strong>",
       "<strong>MCP resources</strong> expose content catalogs — tools for actions, resources for visibility",
       "<strong>Prefer community MCP servers</strong> over custom builds for standard integrations"
     ],
     callout: { type: "key", text: "MCP three-layer model: Client (connects, routes calls) → Host (manages lifecycle) → Server (exposes tools/resources/prompts). Transport: JSON-RPC 2.0 over stdio or HTTP+SSE." },
-    example: { title: "Team MCP Setup", text: "Need GitHub + Slack integration? Don't build custom MCP servers. Check community registry. Configure in .mcp.json with ${'{'}GITHUB_TOKEN{'}'} expansion. Team gets it on git pull." }
+    example: { title: "Team MCP Setup", text: "Need GitHub + Slack integration? Don't build custom MCP servers. Check community registry. Configure in .mcp.json with ${GITHUB_TOKEN} expansion. Team gets it on git pull." }
   },
   {
     type: "content",
@@ -408,6 +408,27 @@ export const slides = [
           ]
         },
         text: "Transport is <strong>JSON-RPC 2.0</strong> over <strong>stdio</strong> or <strong>HTTP+SSE</strong>. Config: <code>.mcp.json</code> (project, git-shared) vs <code>~/.claude.json</code> (personal) — secrets via <code>${ENV_VAR}</code>, never hardcoded. <strong>Check community MCP servers before building a custom one.</strong>"
+      }
+    ]
+  },
+  {
+    type: "content",
+    domain: 2,
+    color: "var(--d2)",
+    task: "Key Considerations",
+    title: "Tool Routing & Error Design — Key Considerations",
+    sections: [
+      {
+        heading: "Misrouting Fix — The Optimisation Sequence (In Order)",
+        table: {
+          headers: ["Step", "Action", "When"],
+          rows: [
+            ["1 — always first", "Expand the tool descriptions", "Any misrouting / selection confusion — lowest effort, highest leverage"],
+            ["2 — if needed", "Add 2-4 few-shot examples", "Descriptions alone still inconsistent"],
+            ["3 — last resort", "Routing classifier / tool consolidation", "Only after 1+2 genuinely fail"]
+          ]
+        },
+        callout: { type: "tip", text: "<strong>Schema design rules:</strong> descriptive parameter names (<code>customer_email</code>, not <code>email</code>); required only when truly mandatory; enum for constrained choices; <strong>keep schemas flat</strong> (nesting raises extraction errors); a description on every property." }
       },
       {
         heading: "Structured Error Shape & the Empty-vs-Failure Test",
@@ -563,13 +584,13 @@ paths: ["src/api/**", "src/middleware/**"]
     task: "3.4",
     title: "Plan Mode, Direct Execution & Iterative Refinement",
     bullets: [
-      "<strong>Plan mode</strong> — complex: multi-file, multiple approaches, architectural decisions",
-      "<strong>Direct execution</strong> — simple, well-scoped, clear stack trace",
-      "<strong>Concrete I/O examples</strong> are the most effective way to pin down transformations",
-      "<strong>TDD iteration:</strong> write failing test → implement → run tests → refine",
-      "<strong>Interview pattern:</strong> have Claude ask questions to surface missed considerations",
-      "<strong>Explore subagent</strong> isolates verbose discovery, preserves main-conversation context",
-      "<strong>Interdependent tasks</strong> - group into a single prompt, <strong>Independent tasks</strong> in separate prompts."
+      "<strong>Plan mode</strong> — complex tasks: large-scale changes, multiple valid approaches, architectural decisions, multi-file changes — safe exploration before committing",
+      "<strong>Direct execution</strong> — simple, well-scoped changes (a single validation, a one-file fix with a clear stack trace)",
+      "<strong>Concrete I/O examples</strong> are the most effective way to pin down transformations when prose is read inconsistently (give 2-3)",
+      "<strong>Test-driven iteration:</strong> write the suite first, then iterate by sharing specific test failures",
+      "<strong>Interview pattern:</strong> have Claude ask questions to surface considerations you missed (useful in unfamiliar domains)",
+      "<strong>Explore subagent</strong> isolates verbose discovery and returns summaries, preserving main-conversation context",
+      "<strong>Single message vs. sequential:</strong> raise all issues at once when they interact; sequentially when they're independent"
     ],
     callout: { type: "tip", text: "The cue: is complexity already stated or hypothetical? Dozens of files / service boundaries → plan mode. Simple bug with clear trace → direct execution." }
   },
@@ -737,12 +758,12 @@ messages.append({"role":"user", "content": "There were errors. Please try again.
     task: "4.5",
     title: "Batch Processing & Multi-Instance Review",
     bullets: [
-      "<strong>Message Batches API:</strong> ~50% cost savings, up to 24-hour window, no latency SLA",
-      "No multi-turn tool calling within a single batch request",
-      "<strong>Appropriate:</strong> overnight reports, nightly test gen (latency-tolerant)",
-      "<strong>Inappropriate:</strong> blocking pre-merge checks developers wait on",
-      "<strong>Self-review limitation:</strong> model retains generation reasoning → confirms own decisions",
-      "<strong>Independent review instances</strong> catch issues better — no prior reasoning context"
+      "<strong>Message Batches API:</strong> ~50% cost savings, up to a 24-hour window, no guaranteed latency SLA",
+      "No multi-turn tool calling within a single batch request; <code>custom_id</code> correlates request/response pairs (order is not guaranteed)",
+      "<strong>Appropriate:</strong> non-blocking, latency-tolerant work — overnight reports, nightly test gen",
+      "<strong>Inappropriate:</strong> blocking workflows like pre-merge checks developers wait on",
+      "<strong>Self-review limitation:</strong> a model retains its generation reasoning, so it's less likely to question its own decisions in the same session",
+      "<strong>Independent review instances</strong> (no prior reasoning context) catch subtle issues better than self-review instructions or extended thinking"
     ],
     callout: { type: "key", text: "Batch = COST tool, not speed tool. 50% cheaper, up to 24h, no SLA. Never for blocking work. Self-review fails because the model keeps its reasoning — use a fresh instance." }
   },
@@ -877,11 +898,12 @@ messages.append({"role":"user", "content": "There were errors. Please try again.
     task: "5.5",
     title: "Human Review, Confidence & Provenance",
     bullets: [
-      "<strong>Aggregate accuracy masks</strong> poor performance on specific types (97% overall hides 70% segment)",
-      "<strong>Stratified validation</strong> per document type surfaces hidden failures",
-      "<strong>Source attribution lost during summarization</strong> — preserve claim-source mappings",
-      "<strong>Conflicting sources → annotate with attribution</strong>, don't pick one value",
-      "<strong>Temporal data:</strong> require publication dates — time differences ≠ contradictions",
+      "<strong>Aggregate accuracy can mask</strong> poor performance on specific document types or fields (97% overall can hide a 70% segment)",
+      "<strong>Stratified random sampling</strong> of high-confidence extractions surfaces novel error patterns; validate by document type and field segment before automating",
+      "<strong>Field-level confidence calibrated on labeled validation sets</strong> routes review attention",
+      "<strong>Source attribution is lost during summarization</strong> when findings are compressed without preserving claim-source mappings",
+      "<strong>Conflicting statistics from credible sources → annotate the conflict with attribution</strong>, don't arbitrarily pick one value",
+      "<strong>Temporal data:</strong> require publication/collection dates so time differences aren't misread as contradictions",
       "<strong>Provenance per claim:</strong> source, confidence, timestamp, agent_id"
     ],
     callout: { type: "key", text: "Resolve conflicts by provenance: verified > extracted > inferred > estimated. Never average or arbitrarily pick. Annotate with full attribution and let the consumer decide." },

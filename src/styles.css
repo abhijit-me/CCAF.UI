@@ -511,7 +511,6 @@ html, body, #root {
 .content-section + .content-section {
   margin-top: 22px;
   padding-top: 6px;
-  border-top: 1px solid var(--border);
 }
 
 .section-heading {

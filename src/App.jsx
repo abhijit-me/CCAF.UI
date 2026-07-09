@@ -100,7 +100,7 @@ function TOCSlide({ goToSlide }) {
     { id: 5, title: "Context Management & Reliability", weight: "15%", color: "var(--d5)" },
   ];
 
-  const domainSlideIndices = [4, 16, 26, 35, 44, 53];
+  const domainSlideIndices = [4, 16, 27, 36, 45, 54];
 
   return (
     <>
@@ -396,7 +396,7 @@ function ThankYouSlide() {
   return (
     <div className="thankyou-slide">
       <div className="title-logo animate-in" style={{marginBottom: 30}}>CC</div>
-      <h2 className="animate-in-delay-1">Thank You!</h2>
+      <h2 className="animate-in-delay-1">All The Best!</h2>
       <p className="animate-in-delay-2" style={{color: 'var(--muted)', fontSize: '1rem', marginTop: 12}}>
         Register for the certification at <a href="https://anthropic.skilljar.com/claude-certified-architect-foundations-certification"><span style={{color: 'var(--accent)', fontWeight: 600}}>this link</span></a>
       </p>
