@@ -75,16 +75,21 @@ function ExamInfoSlide() {
         <div className="callout callout-tip animate-in-delay-4">
           <strong>Green-light rule:</strong> Score 900+ on the Practice Exam first — that's your go/no-go signal. If you don't pass, you can retake the exam after a short waiting period: 14 days after your first attempt, 30 days after your second, and 90 days after your third. You can take up to 4 attempts per exam in any rolling 12-month period.
         </div>
-        <table className="slide-table animate-in-delay-4">
-          <thead><tr><th>Domain</th><th>Weight</th><th>≈ Questions</th></tr></thead>
-          <tbody>
-            <tr><td>D1 · Agentic Architecture</td><td>27%</td><td>~16</td></tr>
-            <tr><td>D2 · Tool Design & MCP</td><td>18%</td><td>~11</td></tr>
-            <tr><td>D3 · Claude Code Config</td><td>20%</td><td>~12</td></tr>
-            <tr><td>D4 · Prompt Engineering</td><td>20%</td><td>~12</td></tr>
-            <tr><td>D5 · Context Management</td><td>15%</td><td>~9</td></tr>
-          </tbody>
-        </table>
+        <div className="exam-grid animate-in-delay-5" style={{marginTop: 20}}>
+          {[
+            { num: "27%", label: "D1 · Agentic Architecture", q: 16 },
+            { num: "18%", label: "D2 · Tool Design & MCP", q: 11 },
+            { num: "20%", label: "D3 · Claude Code Config", q: 12 },
+            { num: "20%", label: "D4 · Prompt Engineering", q: 12 },
+            { num: "15%", label: "D5 · Context Management", q: 9 },
+          ].map((s, i) => (
+            <div key={i} className={`exam-stat animate-in-delay-${i+1}`}>
+              <div className="number">{s.num}</div>
+              <div className="label">{s.label}</div>
+              <div className="label">Approx {s.q} Questions</div>
+            </div>
+          ))}
+        </div>
       </div>
     </>
   );
@@ -100,7 +105,7 @@ function TOCSlide({ goToSlide }) {
     { id: 5, title: "Context Management & Reliability", weight: "15%", color: "var(--d5)" },
   ];
 
-  const domainSlideIndices = [4, 16, 27, 36, 45, 54];
+  const domainSlideIndices = [4, 17, 28, 37, 46, 55];
 
   return (
     <>
@@ -126,7 +131,7 @@ function TOCSlide({ goToSlide }) {
           <li
             key="6"
             className={`toc-item animate-in-delay-6`}
-            onClick={() => goToSlide(53)}
+            onClick={() => goToSlide(55)}
           >
             <div className="toc-badge" style={{background: "#0ea5e9"}}>X</div>
             <div className="toc-text">
@@ -175,10 +180,20 @@ function ContentBlock({ data, color, delayOffset = 1 }) {
         <p className={`section-text animate-in-delay-${delayOffset}`} dangerouslySetInnerHTML={{__html: data.text}} />
       )}
       {data.principles && (
-        <div className={`principles-list animate-in-delay-${delayOffset}`}>
+        <div className="principles-grid">
           {data.principles.map((p, i) => (
-            <div key={i} className="callout callout-key principle-box">
-              <span dangerouslySetInnerHTML={{__html: p}} />
+            <div key={i} className={`principle-card animate-in-delay-${Math.min(i + delayOffset, 6)}`}>
+              <span className="principle-num">{typeof p === 'object' ? p.num : String(i + 1).padStart(2, '0')}</span>
+              <div className="principle-body">
+                {typeof p === 'object' ? (
+                  <>
+                    <h4 className="principle-title" dangerouslySetInnerHTML={{__html: p.title}} />
+                    <p className="principle-text" dangerouslySetInnerHTML={{__html: p.text}} />
+                  </>
+                ) : (
+                  <p className="principle-text" dangerouslySetInnerHTML={{__html: p}} />
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -208,6 +223,7 @@ function ContentSlide({ data }) {
       <div className="slide-header animate-in">
         {data.task && <div className="task-badge" style={{background: data.color}}>{data.task}</div>}
         <h2>{data.title}</h2>
+        {data.subtitle && <p className="subtitle">{data.subtitle}</p>}
       </div>
       <div className="slide-content">
         {data.sections ? (

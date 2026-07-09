@@ -183,26 +183,35 @@ export const slides = [
     type: "content",
     domain: 1,
     color: "var(--d1)",
-    task: "Principles",
-    title: "Domain 1 Patterns & Principles",
+    task: "Patterns",
+    title: "Orchestration Patterns — Pick by Task Shape",
     table: {
       headers: ["Pattern", "Use When", "Key Property"],
       rows: [
-        ["Sequential", "Each step needs previous output", "A → B → C; each receives prior result"],
-        ["Parallel", "Subtasks are independent", "Fan-out/fan-in; no shared state"],
-        ["Pipeline", "Stages have different specializations", "Assembly line; output feeds next stage"],
-        ["Dynamic Adaptive", "Complexity unknown at design time", "Model decides decomposition at runtime"],
-        ["Hub-and-Spoke", "One coordinator, multiple specialists", "Central agent delegates; all comms via hub"]
+        ["Sequential", "Each step needs the previous output", "A → B → C; each step receives the prior result"],
+        ["Parallel", "Subtasks are independent", "Fan-out / fan-in; tasks share no state (cuts wall-clock from sum to slowest-one)"],
+        ["Pipeline", "Stages have different specialisations", "Assembly line; output of one stage feeds the next"],
+        ["Dynamic Adaptive", "Complexity unknown at design time", "The model decides the decomposition at runtime"],
+        ["Hub-and-Spoke", "One coordinator, multiple specialists", "Central agent delegates to focused subagents; all comms via the hub"]
       ]
     },
+    callout: { type: "tip", text: "<strong>Decision rule:</strong> \"independent subtasks\" → <strong>Parallel</strong>. \"each step needs the prior result\" → <strong>Sequential</strong>. \"unknown complexity\" → <strong>Dynamic adaptive</strong>. \"coordinator + specialists\" → <strong>Hub-and-spoke</strong>." }
+  },
+  {
+    type: "content",
+    domain: 1,
+    color: "var(--d1)",
+    task: "Principles",
+    title: "Domain 1 — Cross-Cutting Principles",
+    subtitle: "How to beat distractors",
     principles: [
-      "<strong>01:</strong> Simplest effective fix wins — distractors are over-engineered",
-      "<strong>02:</strong> Deterministic > probabilistic — money/identity/compliance → hooks",
-      "<strong>03:</strong> stop_reason is the only loop signal — never text-parse",
-      "<strong>04:</strong> Subagents are blank slates — pass context explicitly",
-      "<strong>05:</strong> Attribute failures to the right layer — coordinator vs subagent vs tool",
-      "<strong>06:</strong> Structured everything — errors, handoffs, claim-source mappings",
-      "<strong>07:</strong> If tool_use_id mismatches - API returns 400 Bad Request."
+      { num: "01", title: "Simplest effective fix wins", text: "Distractors are often <em>more</em> sophisticated (a classifier, ML model, bigger model). Infrastructure before prompt/description fixes = over-engineering." },
+      { num: "02", title: "Deterministic > probabilistic", text: "Money, identity, compliance, ordering — hooks/gates, never prompt wording." },
+      { num: "03", title: "stop_reason is the only loop signal", text: "Never text-parse; iteration caps are backstops only." },
+      { num: "04", title: "Subagents are blank slates", text: "Pass context explicitly; never assume inheritance, never dump full coordinator context." },
+      { num: "05", title: "Attribute failures to the right layer", text: "Coordinator decomposition vs. subagent execution vs. tool description — match the fix to the actual root cause in the logs." },
+      { num: "06", title: "Structured everything", text: "Structured errors, handoffs, claim-source mappings beat generic strings. Least privilege on tools." },
+      { num: "07", title: "tool_use_id integrity", text: "If a <code>tool_result</code>'s <code>tool_use_id</code> mismatches the originating <code>tool_use</code> block, the API returns a 400 Bad Request." }
     ]
   },
 
@@ -451,12 +460,13 @@ export const slides = [
     domain: 2,
     color: "var(--d2)",
     task: "Principles",
-    title: "Domain 2 Principles",
+    title: "Domain 2 — Cross-Cutting Principles",
+    subtitle: "How to beat distractors",
     principles: [
-      "<strong>01: Fix the description before adding machinery</strong> — routing layers are over-engineering when the problem is thin descriptions",
-      "<strong>02: Structured > generic errors</strong> — always carry category + retryability + reason; never 'Operation failed'",
-      "<strong>03: Least privilege on tools</strong> — 4-5 scoped tools beat 18; narrow cross-role only for proven needs",
-      "<strong>04: Resources for visibility, tools for actions</strong> — expose catalogs as MCP resources. Secrets via env-var expansion"
+      { num: "01", title: "Fix the description before adding machinery", text: "A routing layer / classifier / consolidation is usually over-engineered when the real problem is a thin or overlapping description." },
+      { num: "02", title: "Structured > generic errors", text: "Always carry category + retryability + human reason; never \"Operation failed\" or empty-as-success." },
+      { num: "03", title: "Least privilege on tools", text: "4–5 scoped tools beat 18; narrow cross-role tools only for proven high-frequency needs." },
+      { num: "04", title: "Resources for visibility, tools for actions", text: "Expose catalogs as MCP resources to cut exploratory calls. Secrets via env-var expansion." }
     ]
   },
 
@@ -617,12 +627,13 @@ claude -p "Analyze this PR for security issues. Report only NEW issues." \\
     domain: 3,
     color: "var(--d3)",
     task: "Principles",
-    title: "Domain 3 Principles",
+    title: "Domain 3 — Cross-Cutting Principles",
+    subtitle: "How to beat distractors",
     principles: [
-      "<strong>01: Scope by sharing need</strong> — project for team; user for personal. Most 'teammate isn't getting this' = user scope",
-      "<strong>02: Automatic-by-path → rules globs</strong> — directory CLAUDE.md can't follow scattered files",
-      "<strong>03: Skills vs. CLAUDE.md</strong> — skills = on-demand + isolatable; CLAUDE.md = always-loaded standards",
-      "<strong>04: CI = -p + structured output</strong> — independent review instance beats self-review"
+      { num: "01", title: "Scope by sharing need", text: "Project (committed) for the team; user (<code>~/.claude</code>) for personal-only. Most \"teammate isn't getting this\" = user scope." },
+      { num: "02", title: "Automatic-by-path → rules globs", text: "Directory CLAUDE.md can't follow files scattered across the tree." },
+      { num: "03", title: "Skills vs. CLAUDE.md", text: "Skills = on-demand + isolatable (<code>context: fork</code>); CLAUDE.md = always-loaded standards." },
+      { num: "04", title: "CI = -p + structured output", text: "Independent review instance beats self-review. Plan mode for complex/architectural; direct for narrow/clear." }
     ]
   },
 
@@ -772,12 +783,13 @@ messages.append({"role":"user", "content": "There were errors. Please try again.
     domain: 4,
     color: "var(--d4)",
     task: "Principles",
-    title: "Domain 4 Principles",
+    title: "Domain 4 — Cross-Cutting Principles",
+    subtitle: "How to beat distractors",
     principles: [
-      "<strong>01: Specific criteria > vague</strong> — 'be conservative' doesn't help; categorical rules with examples do",
-      "<strong>02: Schema = syntax, not semantics</strong> — tool_use + schema guarantees shape, not correctness. Pair with validation",
-      "<strong>03: Nullable prevents fabrication</strong> — let model return null. Retries fix format, not absent info",
-      "<strong>04: Match API to latency</strong> — sync for blocking, batch for tolerant. Independent review beats self-review"
+      { num: "01", title: "Specific criteria > vague", text: "\"Be conservative\" / \"only high-confidence\" don't help; categorical rules with examples do." },
+      { num: "02", title: "Schema = syntax, not semantics", text: "Tool-use + JSON schema guarantees shape, not correctness. Pair with validation." },
+      { num: "03", title: "Nullable prevents fabrication", text: "Let the model return <code>null</code>. Retries fix format, not absent info." },
+      { num: "04", title: "Match API to latency", text: "Sync for blocking, batch for tolerant. Independent review beats self-review." }
     ]
   },
 
@@ -914,12 +926,13 @@ messages.append({"role":"user", "content": "There were errors. Please try again.
     domain: 5,
     color: "var(--d5)",
     task: "Principles",
-    title: "Domain 5 Principles",
+    title: "Domain 5 — Cross-Cutting Principles",
+    subtitle: "How to beat distractors",
     principles: [
-      "<strong>01: Structured facts beat vague summaries</strong> — persistent case-facts block; position at start/end",
-      "<strong>02: Escalate on the right signals</strong> — explicit request, policy gap, no progress. Not sentiment",
-      "<strong>03: Structured errors enable recovery</strong> — generic, silent suppression, and full termination are anti-patterns",
-      "<strong>04: Preserve provenance end-to-end</strong> — claim-source mappings, dated findings, conflict annotation"
+      { num: "01", title: "Structured facts beat vague summaries", text: "Keep numbers/dates/expectations in a persistent case-facts block. Position matters — start/end beat the middle." },
+      { num: "02", title: "Escalate on the right signals", text: "Explicit request, policy gap, no progress — not sentiment or self-confidence. Ask for identifiers on ambiguity." },
+      { num: "03", title: "Structured errors enable recovery", text: "Generic statuses, silent suppression, and whole-workflow termination are anti-patterns. Recover transient locally." },
+      { num: "04", title: "Preserve provenance end-to-end", text: "Claim-source mappings, dated findings, conflict annotation over arbitrary selection. Calibrate confidence on labeled data; segment accuracy." }
     ]
   },
 
