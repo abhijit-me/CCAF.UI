@@ -89,6 +89,18 @@ export const slides = [
       "<strong>Parallel spawning</strong> = multiple Task tool calls in a single coordinator response (not across turns)",
       "Write coordinator prompts specifying <strong>goals and quality criteria</strong>, not step-by-step procedures"
     ],
+    code: `// Structured context passing — preserves attribution
+{
+  "findings": [
+    {
+      "content": "...",
+      "source_url": "https://...",
+      "source_title": "...",
+      "retrieved_at": "2026-03-26"
+    }
+  ]
+}
+// Plain concatenation loses attribution. Structured data preserves it.`,
     callout: { type: "key", text: "The prompt is the ONLY way to pass context. No shared memory, no global state, no inherited conversation. If you don't put it in the prompt, the subagent doesn't know it." },
     example: { title: "Parallel Research", text: "Coordinator issues 3 Task calls in ONE response: pricing trends, adoption rates, regulatory changes. All run simultaneously. Each gets ONLY its specific query. Results fan back in for synthesis." }
   },
@@ -128,6 +140,13 @@ export const slides = [
       "<strong>PreToolUse</strong> — intercept outgoing calls to enforce compliance (block refund > $500)",
       "Return {} to allow, or hookSpecificOutput with permissionDecision: 'deny' to block"
     ],
+    table: {
+      headers: ["", "Hooks", "Prompt instructions"],
+      rows: [
+        ["Compliance rate", "100% — code runs", "~99% — probabilistic"],
+        ["Use for", "Financial gates, identity verification, policy rules", "Guidance, style, preference"]
+      ]
+    },
     callout: { type: "key", text: "Governing principle: hooks for deterministic guarantees; prompts only for probabilistic preferences." },
     example: { title: "Normalizing API Responses", text: "3 MCP tools return timestamps in different formats. PostToolUse hook normalizes all to ISO-8601 before Claude sees them — consistent data without extra prompt instructions." }
   },
@@ -328,6 +347,15 @@ export const slides = [
       "Return errorCategory + isRetryable + human-readable message",
       "<strong>Never collapse access failure into empty result</strong> — agent thinks 'no data' when truth is 'couldn't check'"
     ],
+    table: {
+      headers: ["Category", "Example", "isRetryable", "Agent action"],
+      rows: [
+        ["transient", "DB timeout, service unavailable", "true", "Retry with backoff"],
+        ["validation", "Invalid input format", "false", "Fix input, don't retry"],
+        ["business", "Refund exceeds limit", "false", "Escalate, communicate to user"],
+        ["permission", "Access denied", "false", "Rotate credentials or escalate"]
+      ]
+    },
     code: `if amount > policy_limit():
     return {"isError": True, "errorCategory": "business", "isRetryable": False,
             "message": "Refund exceeds $500 auto-approval limit. Escalate."}
@@ -348,7 +376,8 @@ export const slides = [
     bullets: [
       "<strong>Too many tools degrades selection</strong> — 4-5 well-scoped tools beat 18",
       "Scoped access + narrow cross-role tool for proven high-frequency needs",
-      "Replace generic tools with <strong>constrained</strong> ones (fetch_url → load_document)"
+      "Replace generic tools with <strong>constrained</strong> ones (fetch_url → load_document)",
+      "<strong>strict: true</strong> on a tool definition enables Structured Outputs mode — Claude's tool calls are guaranteed to match your schema"
     ],
     table: {
       headers: ["tool_choice", "Behavior", "Use When"],
@@ -358,7 +387,8 @@ export const slides = [
         ["{type:\"tool\",name:...}", "Specific tool must run first", "Force extract_metadata before enrichment"]
       ]
     },
-    callout: { type: "tip", text: "Schema design: descriptive param names, required only when mandatory, enum for constrained choices, keep schemas flat, description on every property." }
+    callout: { type: "tip", text: "Schema design: descriptive param names, required only when mandatory, enum for constrained choices, keep schemas flat, description on every property. Add strict: true to guarantee schema compliance on tool calls." },
+    example: { title: "Least-Privilege Tool Scoping", text: "Research coordinator: [Task, search_web]. Web-search subagent: [search_web, fetch_page]. Synthesis agent: [summarize_findings] — no web search! Each agent gets only the 2-3 tools its role needs, so out-of-role tools can't be misused." }
   },
   {
     type: "content",
@@ -602,6 +632,15 @@ paths: ["src/api/**", "src/middleware/**"]
       "<strong>Explore subagent</strong> isolates verbose discovery and returns summaries, preserving main-conversation context",
       "<strong>Single message vs. sequential:</strong> raise all issues at once when they interact; sequentially when they're independent"
     ],
+    table: {
+      headers: ["Plan Mode Required", "Why"],
+      rows: [
+        ["Large-scale refactor (10+ files)", "Verify scope before execution"],
+        ["Database schema migration", "Irreversible in production"],
+        ["CI/CD deployment", "Broad system impact"],
+        ["Authentication changes", "High-risk, hard to reverse"]
+      ]
+    },
     callout: { type: "tip", text: "The cue: is complexity already stated or hypothetical? Dozens of files / service boundaries → plan mode. Simple bug with clear trace → direct execution." }
   },
   {
@@ -621,6 +660,33 @@ paths: ["src/api/**", "src/middleware/**"]
 claude -p "Analyze this PR for security issues. Report only NEW issues." \\
   --output-format json --json-schema ./review-schema.json > findings.json`,
     callout: { type: "key", text: "Three CI/CD facts: (1) -p for non-interactive, (2) NEVER self-review in same session, (3) --output-format json for parsing. Independent review beats self-review." }
+  },
+  {
+    type: "content",
+    domain: 3,
+    color: "var(--d3)",
+    task: "3.6",
+    title: "Tool Access — allowedTools & permissionMode",
+    bullets: [
+      "<strong>allowedTools</strong> restricts which tools a session/agent may use — a read-only explorer gets [Read, Glob, Grep]",
+      "<strong>disallowedTools</strong> explicitly blocks sensitive tools (e.g., Bash) even when otherwise permitted",
+      "<strong>permissionMode: \"default\"</strong> — prompts the user for approval on each write operation (safe, interactive)",
+      "<strong>permissionMode: \"acceptEdits\"</strong> — auto-approves file read/write; appropriate for CI/CD where no human is present",
+      "<strong>Claude Code hooks</strong> run shell commands at loop points — a PostToolUse matcher can run the linter after every Write, deterministically and without prompting"
+    ],
+    code: `# .claude/settings.json — lint automatically after every Write
+{ "hooks": { "PostToolUse": [
+  { "matcher": { "tool_name": "Write" },
+    "hooks": [{ "type": "command", "command": "npm run lint -- \${file}" }] }
+]}}
+
+# Read-only exploration agent — prompts before any write
+ClaudeAgentOptions(allowed_tools=["Read","Glob","Grep"], permission_mode="default")
+
+# CI/CD dev agent — auto-approves edits, no human in the loop
+ClaudeAgentOptions(allowed_tools=["Read","Glob","Grep","Write","Bash"], permission_mode="acceptEdits")`,
+    callout: { type: "key", text: "permissionMode governs approval friction: 'default' prompts on every write (interactive), 'acceptEdits' auto-approves (CI/CD). Combine allowedTools (allowlist) with disallowedTools (blocklist) for least privilege." },
+    example: { title: "Local vs CI", text: "Local dev: permission_mode='default' so a human approves each write. In CI where nobody is watching: permission_mode='acceptEdits' with a scoped allowedTools list, plus a PostToolUse hook that runs lint after each Write for deterministic quality enforcement." }
   },
   {
     type: "content",
@@ -776,7 +842,41 @@ messages.append({"role":"user", "content": "There were errors. Please try again.
       "<strong>Self-review limitation:</strong> a model retains its generation reasoning, so it's less likely to question its own decisions in the same session",
       "<strong>Independent review instances</strong> (no prior reasoning context) catch subtle issues better than self-review instructions or extended thinking"
     ],
-    callout: { type: "key", text: "Batch = COST tool, not speed tool. 50% cheaper, up to 24h, no SLA. Never for blocking work. Self-review fails because the model keeps its reasoning — use a fresh instance." }
+    table: {
+      headers: ["Criterion", "Batches API", "Synchronous API"],
+      rows: [
+        ["User waiting?", "No — background job", "Yes — live query"],
+        ["Latency requirement", "Hours (24h window)", "Seconds (real-time)"],
+        ["Volume", "High (100s–millions)", "Any"],
+        ["Cost priority", "High (~50% savings)", "Secondary"],
+        ["SLA needed?", "No", "Yes"]
+      ]
+    },
+    callout: { type: "key", text: "Batch = COST tool, not speed tool. 50% cheaper, up to 24h, no SLA. Never for blocking work (chat, search, downstream-blocking steps). Self-review fails because the model keeps its reasoning — use a fresh instance." }
+  },
+  {
+    type: "content",
+    domain: 4,
+    color: "var(--d4)",
+    task: "4.6",
+    title: "Multi-Pass Review Architecture",
+    bullets: [
+      "For complex documents, <strong>dedicated single-purpose passes outperform one combined pass</strong>",
+      "Each pass gets <strong>full attention on one task</strong> — extract, then verify, then score",
+      "A single 'extract + verify + score' pass suffers <strong>attention dilution</strong> → lower quality on all three dimensions",
+      "Passes <strong>chain</strong>: each stage consumes the prior stage's structured output"
+    ],
+    code: `Document (80 pages)
+   │
+   ▼  Pass 1: Claim extraction    ← only extracts claims, no judgment
+   │
+   ▼  Pass 2: Source verification ← only verifies claims against sources
+   │
+   ▼  Pass 3: Credibility scoring ← only synthesizes and scores
+   │
+   ▼  Final report with citations`,
+    callout: { type: "key", text: "Attention dilution is architectural, not a context-size problem. Split one overloaded pass into focused passes; a bigger context window does NOT fix it — it just relocates the diluted zone." },
+    example: { title: "80-Page Research Doc", text: "One prompt asking to extract claims, verify sources, AND score credibility yields mediocre results on all three. Three dedicated passes — extract → verify → score — each with full attention, produce a higher-quality final report with proper citations." }
   },
   {
     type: "content",
@@ -845,6 +945,7 @@ messages.append({"role":"user", "content": "There were errors. Please try again.
     bullets: [
       "<strong>Progressive summarization risk:</strong> condensing numbers/dates/expectations loses critical facts",
       "<strong>'Lost in the middle':</strong> models use beginning and end reliably, may omit middle",
+      "<strong>A bigger context window does NOT fix attention dilution</strong> — it just moves the diluted zone. The fix is always focused per-section passes + a synthesis pass",
       "Extract transactional facts into a <strong>persistent 'case facts' block</strong> at prompt start",
       "<strong>Trim verbose tool outputs</strong> to relevant fields (5 matter, not 40+)"
     ],
@@ -920,6 +1021,31 @@ messages.append({"role":"user", "content": "There were errors. Please try again.
     ],
     callout: { type: "key", text: "Resolve conflicts by provenance: verified > extracted > inferred > estimated. Never average or arbitrarily pick. Annotate with full attribution and let the consumer decide." },
     example: { title: "GDP Conflict", text: "Government reports 3.2% (March 2025), academic DB shows 2.7% (Jan 2025). BAD: pick government / average to 2.95%. GOOD: present both with full provenance, note 2-month data gap. Consumer decides." }
+  },
+  {
+    type: "content",
+    domain: 5,
+    color: "var(--d5)",
+    task: "5.6",
+    title: "Prompt Caching for Cost Optimization",
+    bullets: [
+      "Cache the <strong>KV state of a repeated prompt prefix</strong> to cut cost and latency on subsequent requests",
+      "<strong>Best for large, stable prefixes</strong> reused across many calls — big system prompts, few-shot sets, large reference documents",
+      "Mark the cacheable block with <strong>cache_control: {type: 'ephemeral'}</strong>",
+      "<strong>Any change — even a single character — breaks the prefix match</strong> and forces full re-processing",
+      "<strong>Version or date stamps inside a cached prefix destroy hit rates</strong> — keep the cached prefix byte-for-byte stable"
+    ],
+    code: `response = client.messages.create(
+    model="claude-sonnet-4-6",
+    system=[{
+        "type": "text",
+        "text": large_system_prompt,           # 50K tokens shared across requests
+        "cache_control": {"type": "ephemeral"}  # cache this stable prefix
+    }],
+    messages=[{"role": "user", "content": user_query}]
+)`,
+    callout: { type: "warn", text: "Cache invalidation is prefix-exact: a single changed character (a timestamp, a version bump) breaks the match and re-processes everything. Never put volatile values inside a cached prefix." },
+    example: { title: "50K-Token System Prompt", text: "A support agent shares a 50K-token policy prompt across thousands of queries. Wrap it in a cache_control block once — later requests reuse the cached KV state. But inserting 'Generated 2026-07-09' at the top would bust the cache on every call." }
   },
   {
     type: "content",

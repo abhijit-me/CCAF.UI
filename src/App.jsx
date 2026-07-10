@@ -105,7 +105,7 @@ function TOCSlide({ goToSlide }) {
     { id: 5, title: "Context Management & Reliability", weight: "15%", color: "var(--d5)" },
   ];
 
-  const domainSlideIndices = [4, 17, 28, 37, 46, 55];
+  const domainSlideIndices = [4, 17, 28, 38, 48, 58];
 
   return (
     <>
@@ -131,7 +131,7 @@ function TOCSlide({ goToSlide }) {
           <li
             key="6"
             className={`toc-item animate-in-delay-6`}
-            onClick={() => goToSlide(55)}
+            onClick={() => goToSlide(58)}
           >
             <div className="toc-badge" style={{background: "#0ea5e9"}}>X</div>
             <div className="toc-text">
